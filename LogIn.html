@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bg-dark-blue { background-color: #142850; }
+        .bg-royal-blue { background-color: #27496D; }
+        .bg-sky-blue { background-color: #00909E; }
+        .text-light-blue { color: #DAE1E7; }
+        .focus:ring-sky-blue { --tw-ring-color: #00909E; }
+    </style>
+</head>
+<body class="bg-royal-blue flex items-center justify-center h-screen">
+    <div class="bg-white p-12 rounded-lg shadow-lg w-3/4 flex flex-row">
+        <form class="w-1/2 p-8 m-4 bg-dark-blue rounded-2xl bg-opacity-40 text-light-blue">
+            <h2 class="text-2xl font-bold text-center mb-8 text-light-blue">Login</h2>
+            
+            <label class="block text-light-blue mb-2">Username</label>
+            <input type="text" placeholder="Enter your username" class="w-full px-4 py-3 bg-royal-blue text-light-blue border-none rounded mb-6 focus:outline-none focus:ring-2 focus:ring-sky-blue placeholder-light-blue">
+
+            <label class="block text-light-blue mb-2">Password</label>
+            <input type="password" placeholder="Enter your password" class="w-full px-4 py-3 bg-royal-blue text-light-blue border-none rounded mb-6 focus:outline-none focus:ring-2 focus:ring-sky-blue placeholder-light-blue">
+
+            <div class="flex items-center justify-between mb-6">
+                <label class="flex items-center text-light-blue">
+                    <input type="checkbox" class="mr-2 accent-sky-blue"> Remember me
+                </label>
+                <a href="#" class="text-light-blue hover:text-sky-blue transition duration-300">Forgot password?</a>
+            </div>
+
+            <button class="w-full bg-sky-blue text-dark-blue px-4 py-3 rounded  hover:bg-fuchsia-500 transition duration-300">Login</button>
+        </form>
+        <div class="w-1/2 bg-[url('/media/log_in/dog.jpg')] bg-cover bg-center rounded-3xl m-4  "></div>
+    </div>
+</body>
+</html>
