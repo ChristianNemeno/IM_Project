@@ -1,0 +1,14 @@
+In inserting a user into tbl user it gets the details sa form 
+
+But in inserting the personnel 
+since personnel has two subtypes 
+Manager and trainer 
+
+Their salaries are are initially set to NULL this gives the opportunity to make other crud pages , basta
+The hire date is current time ( currentTimeMillis in jaba)
+ 
+Specific role (Manager/Trainer) assignment is handled elsewhere (Admin Panel)
+Another potential crud 
+
+SO Basically , form this we can have 2 crud but the problem is we need to have an admin interface to change such that
+
