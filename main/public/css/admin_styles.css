@@ -1,0 +1,786 @@
+/* --- Base Variables (Assuming these exist from your original file) --- */
+:root {
+    /* Add your existing variables here if they are not in a separate file */
+    --primary-bg: #1e1e2f; /* Example dark background */
+    --secondary-bg: #27293d; /* Example slightly lighter dark */
+    --surface-bg: #2c2f48; /* Example card background */
+    --primary-text: #ffffff; /* White text */
+    --secondary-text: #a9a9b3; /* Lighter gray text */
+    --primary-accent: #bb86fc; /* Purple accent */
+    --secondary-accent: #03dac6; /* Teal accent */
+    --tertiary-accent: #cf6679; /* Pinkish accent for errors/logout */
+    --divider-border: rgba(255, 255, 255, 0.1); /* Subtle border */
+    --radius-sm: 4px;
+    --radius: 8px;
+    --radius-lg: 12px;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    --shadow-md: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Core Layout --- */
+body {
+    /* Assuming basic body styles are set elsewhere or default */
+    margin: 0;
+    font-family: sans-serif; /* Add a default font */
+    background-color: var(--secondary-bg); /* Set a background for the whole page */
+}
+
+/* --- FIX: Added .admin-dashboard layout --- */
+/* This is the main container holding the sidebar and main content */
+.admin-dashboard {
+    display: flex; /* Crucial for positioning sidebar and main content side-by-side */
+    min-height: 100vh; /* Ensure it takes full viewport height */
+    background-color: var(--secondary-bg); /* Match body or set a specific background */
+}
+
+/* --- Enhanced Sidebar and Header Styles --- */
+
+/* Sidebar Styling */
+.admin-sidebar {
+    width: 260px;
+    background-color: var(--primary-bg);
+    color: var(--primary-text);
+    padding: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0; /* Prevent sidebar from shrinking */
+    border-right: 1px solid var(--divider-border);
+    transition: width 0.3s ease;
+    /* Add subtle gradient background */
+    background-image: linear-gradient(to bottom, rgba(187, 134, 252, 0.05), rgba(3, 218, 198, 0.05));
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Sidebar Logo/Title */
+.admin-sidebar h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-accent);
+    margin-bottom: 2rem;
+    text-align: center;
+    padding: 0 1.5rem;
+    letter-spacing: 0.5px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Add an accent line under the logo */
+.admin-sidebar h2:after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--primary-accent), transparent);
+}
+
+/* Navigation Menu */
+.admin-nav {
+    margin-bottom: 2rem;
+}
+
+.admin-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Navigation Links */
+.admin-nav li a {
+    display: flex;
+    align-items: center;
+    padding: 0.9rem 1.5rem;
+    color: var(--secondary-text);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+    font-weight: 500;
+    font-size: 0.95rem;
+    margin: 0.3rem 0.75rem;
+    border-radius: var(--radius);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Navigation Link Icons */
+.admin-nav li a i.fas { /* Target Font Awesome icons */
+    margin-right: 0.8rem; /* Space between icon and text */
+    width: 20px; /* Fixed width for alignment */
+    text-align: center;
+    font-size: 1.1em; /* Slightly larger icon */
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+}
+
+.admin-nav li a:hover i.fas,
+.admin-nav li a.active i.fas {
+    opacity: 1;
+}
+
+
+/* Add hover effect */
+.admin-nav li a:hover {
+    background-color: rgba(187, 134, 252, 0.1);
+    color: var(--primary-text);
+    border-left-color: rgba(187, 134, 252, 0.5);
+    transform: translateX(3px);
+}
+
+/* Active navigation state */
+.admin-nav li a.active {
+    background-color: rgba(187, 134, 252, 0.15);
+    color: var(--primary-accent);
+    border-left-color: var(--primary-accent);
+    font-weight: 600;
+}
+
+/* Add subtle glow effect to active link */
+.admin-nav li a.active:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center right, rgba(187, 134, 252, 0.2), transparent 70%);
+    pointer-events: none;
+}
+
+/* Footer Section */
+.admin-footer {
+    margin-top: auto; /* Pushes footer to the bottom */
+    padding: 1.2rem 1.5rem;
+    font-size: 0.85rem;
+    text-align: center;
+    color: var(--secondary-text);
+    border-top: 1px solid var(--divider-border);
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex; /* Use flex for alignment */
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Role badge styling */
+.admin-footer span.role-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background-color: rgba(187, 134, 252, 0.2);
+    border: 1px solid var(--primary-accent);
+    color: var(--primary-accent);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin: 0.5rem 0;
+}
+
+/* Logout button styling */
+.admin-footer a {
+    display: inline-flex; /* Use inline-flex for icon alignment */
+    align-items: center;
+    gap: 0.5rem; /* Space between icon and text */
+    margin-top: 0.75rem;
+    padding: 0.5rem 1rem;
+    background-color: rgba(207, 102, 121, 0.1);
+    color: var(--tertiary-accent);
+    text-decoration: none;
+    border-radius: var(--radius);
+    border: 1px solid var(--tertiary-accent);
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.admin-footer a:hover {
+    background-color: var(--tertiary-accent);
+    color: var(--primary-bg);
+    transform: translateY(-2px);
+}
+
+/* Admin main content */
+.admin-main-content {
+    flex-grow: 1; /* Allows main content to take remaining space */
+    padding: 2rem 2.5rem;
+    overflow-y: auto; /* Add scroll if content overflows */
+    background-color: var(--secondary-bg);
+    position: relative; /* Needed for pseudo-element */
+}
+
+/* Add subtle pattern to main content */
+.admin-main-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+    pointer-events: none;
+    z-index: 0; /* Ensure pattern is behind content */
+}
+
+/* Ensure content inside main-content is above the pattern */
+.admin-main-content > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* --- Enhanced Dashboard Styles (from index.php) --- */
+
+/* Dashboard Header */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--divider-border); /* Softened border */
+}
+
+.dashboard-header h1 {
+    color: var(--primary-text); /* Ensure heading color matches theme */
+    margin: 0; /* Remove default margin */
+    font-size: 1.75rem; /* Adjust size */
+}
+
+.user-greeting {
+    display: flex;
+    align-items: center;
+    color: var(--secondary-text);
+    font-size: 1rem; /* Adjusted size */
+    background-color: var(--surface-bg);
+    padding: 0.6rem 1rem; /* Adjusted padding */
+    border-radius: var(--radius); /* Consistent radius */
+    border: 1px solid var(--divider-border);
+    box-shadow: var(--shadow-sm);
+}
+
+.greeting-icon {
+    font-size: 1.3rem; /* Adjusted size */
+    margin-right: 0.6rem; /* Adjusted spacing */
+}
+
+/* Enhanced Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Adjusted minmax */
+    gap: 1.5rem;
+    margin-bottom: 2.5rem; /* Adjusted margin */
+}
+
+.stat-card {
+    background: var(--surface-bg);
+    padding: 1.5rem; /* Adjusted padding */
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--divider-border);
+    box-shadow: var(--shadow);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px; /* Adjusted height */
+    width: 100%;
+    background-color: var(--primary-accent); /* Default accent */
+    border-top-left-radius: var(--radius-lg); /* Match card radius */
+    border-top-right-radius: var(--radius-lg); /* Match card radius */
+    transition: background-color 0.3s ease;
+}
+
+/* Different accent colors for different stat cards */
+.stat-card.users::before { background-color: #BB86FC; /* Purple */ }
+.stat-card.personnel::before { background-color: #03DAC6; /* Teal */ }
+.stat-card.adopters::before { background-color: #CF6679; /* Pinkish */ }
+.stat-card.pets-available::before { background-color: #4CAF50; /* Green */ }
+.stat-card.pets-adopted::before { background-color: #FB8C00; /* Orange */ }
+.stat-card.breeds::before { background-color: #2196F3; /* Blue */ }
+.stat-card.species::before { background-color: #F44336; /* Red */ }
+
+.stat-card:hover {
+    transform: translateY(-4px); /* Slightly less lift */
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-accent); /* Use default accent on hover border */
+}
+
+.stat-icon {
+    font-size: 2.2rem; /* Adjusted size */
+    margin-right: 1rem; /* Adjusted spacing */
+    opacity: 0.7; /* Slightly less opacity */
+    line-height: 1; /* Ensure icon aligns well */
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-label {
+    font-size: 0.9rem; /* Adjusted size */
+    color: var(--secondary-text);
+    font-weight: 500;
+    margin-bottom: 0.4rem; /* Adjusted spacing */
+    display: block;
+}
+
+.stat-value {
+    font-size: 2rem; /* Adjusted size */
+    font-weight: 700;
+    color: var(--primary-text);
+    line-height: 1.1;
+}
+
+/* Dashboard Sections */
+.dashboard-sections {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+/* Quick Actions Section */
+.quick-actions-section {
+    background-color: var(--surface-bg);
+    padding: 1.75rem; /* Adjusted padding */
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--divider-border);
+}
+
+.quick-actions-section h2 {
+    font-size: 1.25rem; /* Adjusted size */
+    font-weight: 600;
+    color: var(--primary-text);
+    margin-top: 0;
+    margin-bottom: 1.25rem; /* Adjusted spacing */
+    padding-bottom: 0.5rem; /* Adjusted spacing */
+    border-bottom: 1px solid var(--divider-border);
+}
+
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Adjusted minmax */
+    gap: 1rem; /* Adjusted gap */
+}
+
+.quick-action-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--secondary-bg);
+    padding: 1.25rem 1rem; /* Adjusted padding */
+    border-radius: var(--radius);
+    border: 1px solid var(--divider-border);
+    text-decoration: none;
+    transition: all 0.25s ease;
+    text-align: center;
+    color: var(--primary-text); /* Ensure text is visible */
+}
+
+.quick-action-card:hover {
+    transform: translateY(-4px); /* Slightly less lift */
+    border-color: var(--primary-accent);
+    background-color: rgba(187, 134, 252, 0.1); /* Lighter hover */
+    box-shadow: var(--shadow);
+}
+
+.action-icon {
+    font-size: 1.8rem; /* Adjusted size */
+    margin-bottom: 0.6rem; /* Adjusted spacing */
+    color: var(--primary-accent);
+    transition: transform 0.2s ease;
+}
+
+.quick-action-card:hover .action-icon {
+    transform: scale(1.15); /* Slightly less scale */
+}
+
+.action-title {
+    color: var(--primary-text); /* Ensure text is visible */
+    font-weight: 500;
+    font-size: 0.95rem; /* Adjusted size */
+    line-height: 1.3; /* Improve readability */
+}
+
+
+/* --- General Admin Styles --- */
+
+/* Headings */
+h1 {
+    color: var(--primary-text);
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
+
+/* Buttons */
+.admin-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.7rem 1.3rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    background-color: var(--primary-accent);
+    color: var(--primary-bg);
+    box-shadow: var(--shadow-sm);
+}
+
+.admin-button:hover {
+    opacity: 0.9;
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+}
+
+.admin-button.secondary {
+    background-color: var(--surface-bg);
+    color: var(--primary-text);
+    border-color: var(--divider-border);
+}
+
+.admin-button.secondary:hover {
+    background-color: var(--secondary-bg);
+    border-color: var(--secondary-text);
+}
+
+/* Forms */
+.admin-form-container {
+    background-color: var(--surface-bg);
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--divider-border);
+    max-width: 700px; /* Limit form width */
+    margin: 0 auto; /* Center form */
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--secondary-text);
+    font-size: 0.9rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="tel"],
+.form-group input[type="file"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--divider-border);
+    background-color: var(--secondary-bg);
+    color: var(--primary-text);
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box; /* Include padding and border in element's total width/height */
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-accent);
+    box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.2);
+}
+
+.form-group small {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--secondary-text);
+}
+
+.form-group .text-right {
+    text-align: right;
+}
+
+.form-group.mt-4 {
+    margin-top: 1.5rem; /* Consistent spacing */
+}
+
+/* Tables */
+.admin-table-section {
+    background-color: var(--surface-bg);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--divider-border);
+    overflow-x: auto; /* Allow horizontal scrolling on small screens */
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 0.9rem 1.1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--divider-border);
+    color: var(--secondary-text);
+    font-size: 0.9rem;
+    vertical-align: middle; /* Align content vertically */
+}
+
+.admin-table th {
+    background-color: rgba(0, 0, 0, 0.15);
+    color: var(--primary-text);
+    font-weight: 600;
+    white-space: nowrap; /* Prevent headers from wrapping */
+}
+
+.admin-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.admin-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.admin-table td.actions {
+    white-space: nowrap; /* Prevent action buttons from wrapping */
+    text-align: right;
+}
+
+.action-btn {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    margin-left: 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.action-btn.edit {
+    background-color: rgba(33, 150, 243, 0.2); /* Blue */
+    border-color: rgba(33, 150, 243, 0.5);
+    color: #64b5f6;
+}
+.action-btn.edit:hover { background-color: rgba(33, 150, 243, 0.4); color: #bbdefb; }
+
+.action-btn.delete {
+    background-color: rgba(244, 67, 54, 0.2); /* Red */
+    border-color: rgba(244, 67, 54, 0.5);
+    color: #ef9a9a;
+}
+.action-btn.delete:hover { background-color: rgba(244, 67, 54, 0.4); color: #ffcdd2; }
+
+.action-btn.view {
+    background-color: rgba(76, 175, 80, 0.2); /* Green */
+    border-color: rgba(76, 175, 80, 0.5);
+    color: #a5d6a7;
+}
+.action-btn.view:hover { background-color: rgba(76, 175, 80, 0.4); color: #c8e6c9; }
+
+
+/* Status Badges (e.g., health, adoption) */
+.health-status, .adoption-status /* Add more specific classes if needed */ {
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-block;
+    text-transform: capitalize;
+}
+/* Example status colors */
+.health-status.excellent, .adoption-status.available { background-color: rgba(76, 175, 80, 0.2); color: #a5d6a7; } /* Green */
+.health-status.good, .adoption-status.pending { background-color: rgba(33, 150, 243, 0.2); color: #90caf9; } /* Blue */
+.health-status.fair { background-color: rgba(255, 152, 0, 0.2); color: #ffcc80; } /* Orange */
+.health-status.poor, .adoption-status.adopted { background-color: rgba(117, 117, 117, 0.2); color: #e0e0e0; } /* Gray */
+
+
+/* Messages (Success/Error) */
+.message {
+    padding: 0.9rem 1.2rem;
+    margin-bottom: 1.5rem;
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    font-size: 0.9rem;
+}
+
+.success-message {
+    background-color: rgba(3, 218, 198, 0.15); /* Teal */
+    border-color: var(--secondary-accent);
+    color: var(--secondary-accent);
+}
+
+.error-message {
+    background-color: rgba(207, 102, 121, 0.15); /* Pinkish */
+    border-color: var(--tertiary-accent);
+    color: var(--tertiary-accent);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .admin-sidebar {
+        width: 70px; /* Collapse sidebar */
+        overflow: hidden; /* Hide text overflow */
+    }
+
+    .admin-sidebar h2 {
+        font-size: 1.2rem;
+        padding: 0 0.5rem;
+        justify-content: center;
+    }
+     .admin-sidebar h2 i.fas { /* Ensure icon is visible */
+        margin-right: 0;
+    }
+     .admin-sidebar h2 span { /* Hide text part of title */
+       /* display: none; */ /* Keep title for accessibility if needed */
+       font-size: 0; /* Hide visually */
+       width: 0;
+       opacity: 0;
+    }
+     .admin-sidebar h2:after {
+        display: none; /* Hide accent line */
+    }
+
+    .admin-nav li a {
+        padding: 0.9rem 0;
+        justify-content: center;
+        margin: 0.3rem 0.5rem;
+    }
+
+    .admin-nav li a span {
+        display: none; /* Hide text */
+    }
+    .admin-nav li a i.fas {
+        margin-right: 0; /* Remove margin when text is hidden */
+        font-size: 1.3em; /* Make icons slightly larger */
+    }
+
+
+    .admin-footer {
+        padding: 1rem 0.5rem;
+    }
+    .admin-footer div, /* Hide text */
+    .admin-footer span.role-badge {
+        display: none;
+    }
+    .admin-footer a span { /* Hide logout text */
+        display: none;
+    }
+     .admin-footer a i.fas { /* Center logout icon */
+        margin: 0 auto;
+    }
+
+    .admin-main-content {
+        padding: 1.5rem;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem; /* Add gap between items when stacked */
+    }
+
+    .user-greeting {
+        /* margin-top: 1rem; */ /* Removed margin, using gap now */
+        width: 100%;
+        justify-content: center; /* Center greeting text */
+        box-sizing: border-box;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr; /* Two columns on smaller tablets */
+    }
+
+    .quick-actions-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); /* Adjust for smaller cards */
+    }
+
+    .stat-card {
+        padding: 1rem;
+        flex-direction: column; /* Stack icon and content */
+        align-items: flex-start; /* Align items left */
+        text-align: left;
+    }
+
+    .stat-icon {
+        font-size: 1.8rem;
+        margin-right: 0;
+        margin-bottom: 0.5rem; /* Add space below icon */
+    }
+
+    .stat-value {
+        font-size: 1.6rem;
+    }
+
+    .quick-actions-section {
+        padding: 1rem;
+    }
+
+     h1 {
+        font-size: 1.5rem;
+    }
+    .admin-form-container {
+        padding: 1.5rem;
+    }
+    .admin-table th, .admin-table td {
+        padding: 0.7rem 0.8rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr; /* Single column on very small screens */
+    }
+
+    .quick-actions-grid {
+        grid-template-columns: 1fr 1fr; /* Two columns */
+    }
+
+    .action-icon {
+        font-size: 1.6rem;
+    }
+
+    .action-title {
+        font-size: 0.85rem;
+    }
+
+     .admin-main-content {
+        padding: 1rem;
+    }
+     h1 {
+        font-size: 1.3rem;
+    }
+     .admin-button {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+    .admin-form-container {
+        padding: 1rem;
+    }
+}

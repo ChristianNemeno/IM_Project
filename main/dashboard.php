@@ -31,11 +31,25 @@ $placeholderImages = [
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Pet Adoption & Training Dashboard</title>
-        <link rel="stylesheet" href="multimedia/styles.css" />
+        <link rel="stylesheet" href="public/css/styles.css" />
+         <style>
+            /* Add a simple style for the logout button */
+            .logout-button {
+                padding: 0.5rem 1rem;
+                background-color: var(--primary); /* Use your theme color */
+                color: white;
+                text-decoration: none;
+                border-radius: 0.5rem;
+                transition: background-color 0.2s ease;
+                margin-left: 1rem; /* Add some space */
+            }
+            .logout-button:hover {
+                background-color: var(--primary-dark); /* Darker shade on hover */
+            }
+        </style>
     </head>
     <body>
         <div class="dashboard">
-            <!-- Navigation -->
             <nav class="nav">
                 <div class="nav-container">
                     <div class="nav-logo">
@@ -54,14 +68,14 @@ $placeholderImages = [
                                 class="search-input"
                             />
                         </div>
-                        <div class="profile-pic"></div>
-                    </div>
+                        <div class="profile-pic">
+                            </div>
+                        <a href="logout.php" class="logout-button">Logout</a>
+                         </div>
                 </div>
             </nav>
 
-            <!-- Main Content -->
             <main class="main-content">
-                <!-- Stats Grid -->
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-label">Total Pets</div>
@@ -85,7 +99,6 @@ $placeholderImages = [
                     </div>
                 </div>
 
-                <!-- Pet Table Section -->
                 <div class="table-section">
                     <h2>Pet Registry</h2>
                     <div class="table-container">
@@ -120,7 +133,6 @@ $placeholderImages = [
                     </div>
                 </div>
 
-                <!-- Species Distribution Graph -->
                 <div class="graph-section">
                     <h2>Pet Distribution by Species</h2>
                     <div class="graph-container">
@@ -132,7 +144,7 @@ $placeholderImages = [
                             </div>
                         </div>
                         <?php endforeach; ?>
-                        
+
                         <?php if (count($speciesDistribution) < 2): // Add placeholder for other species if less than 2 species ?>
                         <div class="graph-bar-container">
                             <div class="graph-label">Others</div>
@@ -144,9 +156,7 @@ $placeholderImages = [
                     </div>
                 </div>
 
-                <!-- Content Grid -->
                 <div class="content-grid">
-                    <!-- Recent Pets -->
                     <div class="pets-section">
                         <h2>Recent Pets</h2>
                         <div class="pet-cards">
@@ -170,7 +180,6 @@ $placeholderImages = [
                         </div>
                     </div>
 
-                    <!-- Training Schedule -->
                     <div class="schedule-section">
                         <h2>Upcoming Training</h2>
                         <div class="schedule-cards">
@@ -181,12 +190,12 @@ $placeholderImages = [
                                         <?php echo htmlspecialchars($training['type_name']); ?> Training
                                     </div>
                                     <div class="training-time">
-                                        <?php echo date('M d, Y', strtotime($training['date'])); ?> • 
+                                        <?php echo date('M d, Y', strtotime($training['date'])); ?> •
                                         <?php echo $training['duration']; ?> min
                                     </div>
                                 </div>
                                 <div class="training-pet">
-                                    <?php echo htmlspecialchars($training['name']); ?> • 
+                                    <?php echo htmlspecialchars($training['name']); ?> •
                                     <?php echo htmlspecialchars($training['breed_name']); ?>
                                 </div>
                             </div>

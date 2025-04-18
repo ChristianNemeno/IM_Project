@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 15, 2025 at 05:03 AM
+-- Generation Time: Apr 16, 2025 at 07:43 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -153,7 +153,8 @@ CREATE TABLE `tblpersonnel` (
 INSERT INTO `tblpersonnel` (`personnel_id`, `hire_date`, `salary`) VALUES
 (6, '2023-01-01', 50000.00),
 (7, '2023-02-01', 45000.00),
-(8, '2023-03-01', 48000.00);
+(8, '2023-03-01', 48000.00),
+(10, '2025-04-16', NULL);
 
 -- --------------------------------------------------------
 
@@ -301,7 +302,9 @@ INSERT INTO `tbluser` (`user_id`, `name`, `phone`, `email`, `address`, `user_typ
 (5, 'Sara Lee', '567-890-1234', 'sara@example.com', '202 Maple St', 'Adopter', '', '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
 (6, 'Bob Brown', '678-901-2345', 'bob@example.com', '321 Pine St', 'Personnel', '', '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
 (7, 'Charlie Davis', '789-012-3456', 'charlie@example.com', '654 Cedar St', 'Personnel', '', '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
-(8, 'Emma Clark', '890-123-4567', 'emma@example.com', '987 Birch St', 'Personnel', '', '2025-04-11 05:08:09', '2025-04-11 05:08:09');
+(8, 'Emma Clark', '890-123-4567', 'emma@example.com', '987 Birch St', 'Personnel', '', '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
+(9, 'Jude Valencia Syndikato', '09822', 'jude@gmail.com', 'guadlaupe cebu', 'Adopter', '$2y$10$zSnYGeHxtgV36p/vc9BBg.bZz04Zj4dy6.wNq/aV9kh/vyD48cb0q', '2025-04-15 03:09:14', '2025-04-15 03:09:14'),
+(10, 'Ben Escolano', '123', 'ben@gmail.com', 'Lacion', 'Personnel', '$2y$10$7dBi4ckn2rByTv56GrNceu9MGFznEJTEXc3IfKAWKs4yqZtpQYJ7K', '2025-04-16 14:30:08', '2025-04-16 14:30:08');
 
 --
 -- Indexes for dumped tables
@@ -439,7 +442,7 @@ ALTER TABLE `tbltrainingtype`
 -- AUTO_INCREMENT for table `tbluser`
 --
 ALTER TABLE `tbluser`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Constraints for dumped tables
