@@ -356,9 +356,6 @@ function getPersonnelUserById($user_id) {
     if ($conn) $conn->close();
     return $user;
 }
-
-
-
 /**
  * Sets or removes the Manager role for a given Personnel user.
  * Assumes Manager and Trainer roles are mutually exclusive.
@@ -465,8 +462,6 @@ function setManagerStatus($user_id, $make_manager) {
 
     return $success;
 }
-
-
 // --- Training Management Functions ---
 
 /**
@@ -567,8 +562,6 @@ function getAllUsersAdmin() {
     if ($conn) $conn->close();
     return $users;
 }
-
-
 // --- Adoption Management Functions ---
 
 /**
@@ -618,6 +611,445 @@ function getAllAdoptionsAdmin() {
     if ($conn) $conn->close();
     return $adoptions;
 }
+
+/**
+ * Fetches details for a specific user for editing by an admin.
+ * Excludes sensitive information like password hash.
+ * @param int $user_id The ID of the user to fetch.
+ * @return array|null User details (id, name, phone, email, address, user_type) or null if not found/error.
+ */
+function getUserByIdAdmin($user_id) {
+    $conn = getDbConnection();
+    if (!$conn) return null;
+    $user = null;
+
+    // Select only the fields needed for editing by admin
+    $sql = "SELECT user_id, name, phone, email, address, user_type
+            FROM tbluser
+            WHERE user_id = ?";
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt) {
+        try {
+            $stmt->bind_param("i", $user_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($result->num_rows === 1) {
+                $user = $result->fetch_assoc();
+            }
+        } catch (Exception $e) {
+             error_log("Error fetching user by ID Admin ($user_id): " . $e->getMessage());
+        } finally {
+            $stmt->close();
+        }
+     } else {
+         error_log("Prepare failed for getUserByIdAdmin: (" . $conn->errno . ") " . $conn->error);
+    }
+
+    if ($conn) $conn->close();
+    return $user;
+}
+
+
+/**
+ * Updates basic user details (name, phone, email, address) by an admin.
+ * Does NOT update password or user_type.
+ * @param int $user_id The ID of the user to update.
+ * @param string $name User's full name.
+ * @param string $phone User's phone number.
+ * @param string $email User's email address.
+ * @param string $address User's address.
+ * @return bool True on success, false on failure or if email already exists for another user.
+ */
+function updateUserAdmin($user_id, $name, $phone, $email, $address) {
+    $conn = getDbConnection();
+    if (!$conn) return false;
+    $success = false;
+
+    // --- Check if the new email already exists for ANOTHER user ---
+    $email_check_sql = "SELECT user_id FROM tbluser WHERE email = ? AND user_id != ?";
+    $email_stmt = $conn->prepare($email_check_sql);
+    $email_exists = false;
+    if ($email_stmt) {
+        $email_stmt->bind_param("si", $email, $user_id);
+        $email_stmt->execute();
+        $email_stmt->store_result();
+        if ($email_stmt->num_rows > 0) {
+            $email_exists = true; // Email is used by someone else
+        }
+        $email_stmt->close();
+    } else {
+         error_log("Prepare failed for email check in updateUserAdmin: (" . $conn->errno . ") " . $conn->error);
+         if ($conn) $conn->close();
+         // Optionally set a specific error message here or let the calling script handle it
+         return false; // Cannot proceed without email check
+    }
+
+    if ($email_exists) {
+        error_log("Attempted to update user ID $user_id with email '$email' which already exists for another user.");
+         if ($conn) $conn->close();
+        // Set a specific error code or return a specific value if needed by the calling page
+        return false; // Prevent update due to duplicate email
+    }
+    // --- End Email Check ---
+
+
+    // Proceed with the update if email is unique
+    $sql = "UPDATE tbluser SET name = ?, phone = ?, email = ?, address = ?, updated_at = NOW()
+            WHERE user_id = ?";
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt) {
+        try {
+            $stmt->bind_param("ssssi", $name, $phone, $email, $address, $user_id);
+            if ($stmt->execute()) {
+                // Treat 0 affected rows (no change needed) as success if no error occurred
+                $success = $stmt->affected_rows >= 0;
+                if ($stmt->errno != 0) { // If there was an actual DB error
+                    $success = false;
+                    error_log("Execute failed for updateUserAdmin (ID: $user_id): " . $stmt->error);
+                }
+            } else {
+                 error_log("Execute failed for updateUserAdmin (ID: $user_id): " . $stmt->error);
+                 $success = false;
+            }
+        } catch (Exception $e) {
+             error_log("Error updating user admin (ID: $user_id): " . $e->getMessage());
+             $success = false;
+        } finally {
+            $stmt->close();
+        }
+    } else {
+         error_log("Prepare failed for updateUserAdmin: (" . $conn->errno . ") " . $conn->error);
+    }
+
+    if ($conn) $conn->close();
+    return $success;
+}
+
+
+/**
+ * These are additions to training 
+ */
+
+
+/**
+ * Fetches all personnel who are designated as trainers.
+ * @return array List of trainers (user_id, name) or empty array on failure.
+ */
+function getAllTrainersAdmin() {
+    $conn = getDbConnection();
+    $trainers = [];
+    if (!$conn) return $trainers;
+
+    // Select user ID and name for users who exist in the tbltrainer table
+    $sql = "SELECT u.user_id, u.name
+            FROM tbluser u
+            JOIN tbltrainer t ON u.user_id = t.trainer_id
+            WHERE u.user_type = 'Personnel' -- Ensure they are personnel
+            ORDER BY u.name ASC";
+
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt) {
+        try {
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) {
+                $trainers[] = $row;
+            }
+        } catch (Exception $e) {
+            error_log("Error fetching all trainers admin: " . $e->getMessage());
+        } finally {
+            $stmt->close();
+        }
+    } else {
+         error_log("Prepare failed for getAllTrainersAdmin: (" . $conn->errno . ") " . $conn->error);
+    }
+
+    if ($conn) $conn->close();
+    return $trainers;
+}
+
+/**
+ * Fetches all available training types.
+ * @return array List of training types (type_id, type_name) or empty array on failure.
+ */
+function getAllTrainingTypesAdmin() {
+    $conn = getDbConnection();
+    $types = [];
+    if (!$conn) return $types;
+
+    $sql = "SELECT type_id, type_name FROM tbltrainingtype ORDER BY type_name ASC";
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt) {
+        try {
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) {
+                $types[] = $row;
+            }
+        } catch (Exception $e) {
+            error_log("Error fetching all training types admin: " . $e->getMessage());
+        } finally {
+            $stmt->close();
+        }
+    } else {
+         error_log("Prepare failed for getAllTrainingTypesAdmin: (" . $conn->errno . ") " . $conn->error);
+    }
+
+    if ($conn) $conn->close();
+    return $types;
+}
+
+/**
+ * Fetches pets suitable for scheduling training (e.g., those not marked as 'Adopted').
+ * @return array List of pets (pet_id, name) or empty array on failure.
+ */
+function getPetsForDropdown() {
+    $conn = getDbConnection();
+    $pets = [];
+    if (!$conn) return $pets;
+
+    // Fetch pets that are 'Available' or 'Pending' (assuming 'Adopted' pets don't get training)
+    $sql = "SELECT pet_id, name FROM tblpet
+            WHERE adoption_status IN ('Available', 'Pending')
+            ORDER BY name ASC";
+    $stmt = $conn->prepare($sql);
+
+     if ($stmt) {
+        try {
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) {
+                $pets[] = $row;
+            }
+        } catch (Exception $e) {
+            error_log("Error fetching pets for dropdown: " . $e->getMessage());
+        } finally {
+            $stmt->close();
+        }
+    } else {
+         error_log("Prepare failed for getPetsForDropdown: (" . $conn->errno . ") " . $conn->error);
+    }
+
+    if ($conn) $conn->close();
+    return $pets;
+}
+
+
+/**
+ * Schedules a new training session by inserting it into the database.
+ * @param int $pet_id The ID of the pet.
+ * @param int $trainer_id The ID of the trainer (must be a valid user_id in tbltrainer).
+ * @param int $type_id The ID of the training type.
+ * @param string $date The date of the session (YYYY-MM-DD format).
+ * @param int $duration The duration of the session in minutes.
+ * @return int|false The ID of the newly inserted session, or false on failure.
+ */
+function scheduleTrainingSession($pet_id, $trainer_id, $type_id, $date, $duration) {
+    $conn = getDbConnection();
+    if (!$conn) return false;
+    $newSessionId = false;
+
+    // Note: Assumes input parameters ($pet_id, $trainer_id, $type_id) are valid IDs
+    // existing in their respective tables. Add checks if necessary.
+
+    $sql = "INSERT INTO tbltrainingsession (pet_id, trainer_id, type_id, date, duration, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, NOW(), NOW())";
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt) {
+        try {
+            // Bind parameters: i=integer, s=string, d=double, b=blob
+            $stmt->bind_param("iiisi", $pet_id, $trainer_id, $type_id, $date, $duration);
+            if ($stmt->execute()) {
+                $newSessionId = $conn->insert_id;
+            } else {
+                 error_log("Execute failed for scheduleTrainingSession: " . $stmt->error);
+            }
+        } catch (Exception $e) {
+             error_log("Error scheduling training session: " . $e->getMessage());
+        } finally {
+            $stmt->close();
+        }
+    } else {
+         error_log("Prepare failed for scheduleTrainingSession: (" . $conn->errno . ") " . $conn->error);
+    }
+
+    if ($conn) $conn->close();
+    return $newSessionId;
+}
+
+/**
+ * Fetches detailed information for a specific adoption record.
+ * Joins user, pet, breed, and species tables for comprehensive details.
+ * @param int $adoption_id The ID of the adoption record to fetch.
+ * @return array|null Detailed adoption record or null if not found/error.
+ */
+function getAdoptionDetailsAdmin($adoption_id) {
+    $conn = getDbConnection();
+    if (!$conn) return null;
+    $details = null;
+
+    $sql = "SELECT
+                ar.adoption_id,
+                ar.adoption_date,
+                ar.fee_paid,
+                ar.created_at AS record_created_at,
+                p.pet_id,
+                p.name AS pet_name,
+                p.age AS pet_age, -- Age at the time of fetching, not adoption
+                p.health_status AS pet_health_status, -- Current health status
+                p.pet_image, -- Pet image filename
+                b.breed_name,
+                s.species_name,
+                u.user_id AS adopter_user_id,
+                u.name AS adopter_name,
+                u.email AS adopter_email,
+                u.phone AS adopter_phone,
+                u.address AS adopter_address,
+                u.created_at AS adopter_registered_at
+            FROM tbladoptionrecord ar
+            JOIN tblpet p ON ar.pet_id = p.pet_id
+            JOIN tblbreed b ON p.breed_id = b.breed_id
+            JOIN tblspecies s ON b.species_id = s.species_id
+            JOIN tbladopter a ON ar.adopter_id = a.adopter_id -- Link adoption to adopter record
+            JOIN tbluser u ON a.adopter_id = u.user_id      -- Link adopter record to user record
+            WHERE ar.adoption_id = ?";
+
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt) {
+        try {
+            $stmt->bind_param("i", $adoption_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($result->num_rows === 1) {
+                $details = $result->fetch_assoc();
+            }
+        } catch (Exception $e) {
+             error_log("Error fetching adoption details admin (ID: $adoption_id): " . $e->getMessage());
+        } finally {
+            $stmt->close();
+        }
+     } else {
+         error_log("Prepare failed for getAdoptionDetailsAdmin: (" . $conn->errno . ") " . $conn->error);
+    }
+
+    if ($conn) $conn->close();
+    return $details;
+}
+
+/**
+ * Fetches detailed information for a specific training session.
+ * Joins pet, trainer (user), type, breed, species tables.
+ * @param int $session_id The ID of the training session to fetch.
+ * @return array|null Detailed session information or null if not found/error.
+ */
+function getTrainingSessionDetailsAdmin($session_id) {
+    $conn = getDbConnection();
+    if (!$conn) return null;
+    $details = null;
+
+    $sql = "SELECT
+                ts.session_id,
+                ts.date,
+                ts.duration,
+                ts.created_at AS record_created_at,
+                p.pet_id,
+                p.name AS pet_name,
+                p.pet_image, -- Pet image filename
+                b.breed_name,
+                s.species_name,
+                u.user_id AS trainer_user_id,
+                u.name AS trainer_name,
+                u.email AS trainer_email,
+                u.phone AS trainer_phone,
+                tt.type_id,
+                tt.type_name AS training_type_name
+            FROM tbltrainingsession ts
+            JOIN tblpet p ON ts.pet_id = p.pet_id
+            JOIN tblbreed b ON p.breed_id = b.breed_id
+            JOIN tblspecies s ON b.species_id = s.species_id
+            JOIN tbltrainingtype tt ON ts.type_id = tt.type_id
+            JOIN tbltrainer t ON ts.trainer_id = t.trainer_id -- Link session to trainer record
+            JOIN tbluser u ON t.trainer_id = u.user_id      -- Link trainer record to user record
+            WHERE ts.session_id = ?";
+
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt) {
+        try {
+            $stmt->bind_param("i", $session_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($result->num_rows === 1) {
+                $details = $result->fetch_assoc();
+            }
+        } catch (Exception $e) {
+             error_log("Error fetching training session details admin (ID: $session_id): " . $e->getMessage());
+        } finally {
+            $stmt->close();
+        }
+     } else {
+         error_log("Prepare failed for getTrainingSessionDetailsAdmin: (" . $conn->errno . ") " . $conn->error);
+    }
+
+    if ($conn) $conn->close();
+    return $details;
+}
+
+/**
+ * Updates an existing training session.
+ * @param int $session_id The ID of the session to update.
+ * @param int $pet_id The new Pet ID.
+ * @param int $trainer_id The new Trainer ID.
+ * @param int $type_id The new Training Type ID.
+ * @param string $date The new date (YYYY-MM-DD).
+ * @param int $duration The new duration in minutes.
+ * @return bool True on success, false on failure.
+ */
+function updateTrainingSession($session_id, $pet_id, $trainer_id, $type_id, $date, $duration) {
+    $conn = getDbConnection();
+    if (!$conn) return false;
+    $success = false;
+
+    $sql = "UPDATE tbltrainingsession
+            SET pet_id = ?, trainer_id = ?, type_id = ?, date = ?, duration = ?, updated_at = NOW()
+            WHERE session_id = ?";
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt) {
+        try {
+            // Bind parameters: i=integer, s=string
+            $stmt->bind_param("iiisii", $pet_id, $trainer_id, $type_id, $date, $duration, $session_id);
+            if ($stmt->execute()) {
+                // Treat 0 affected rows (no change needed) as success if no error occurred
+                 $success = $stmt->affected_rows >= 0;
+                if ($stmt->errno != 0) { // If there was an actual DB error
+                    $success = false;
+                    error_log("Execute failed for updateTrainingSession (ID: $session_id): " . $stmt->error);
+                }
+            } else {
+                 error_log("Execute failed for updateTrainingSession (ID: $session_id): " . $stmt->error);
+                 $success = false;
+            }
+        } catch (Exception $e) {
+             error_log("Error updating training session (ID: $session_id): " . $e->getMessage());
+             $success = false;
+        } finally {
+            $stmt->close();
+        }
+    } else {
+         error_log("Prepare failed for updateTrainingSession: (" . $conn->errno . ") " . $conn->error);
+    }
+
+    if ($conn) $conn->close();
+    return $success;
+}
+
 
 
 // --- Placeholder for other admin functions ---

@@ -74,12 +74,14 @@ require_once('partials/header.php');
                             ?>
                         </td>
                         <td><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
+
                         <td class="actions">
-                            <a href="edit_user.php?id=<?php echo $user['user_id']; ?>" class="action-btn edit" title="Edit User (Not Implemented)">Edit</a>
+                            <a href="edit_user.php?id=<?php echo $user['user_id']; ?>" class="action-btn edit">Edit</a>
                              <?php if ($user['user_type'] === 'Personnel'): ?>
-                                <a href="manage_roles.php?user_id=<?php echo $user['user_id']; ?>" class="action-btn view" title="Manage Roles (Not Implemented)">Roles</a>
+                                <a href="manage_roles.php?user_id=<?php echo $user['user_id']; ?>" class="action-btn view" title="Manage Roles">Roles</a>
                             <?php endif; ?>
-                            </td>
+                        </td>
+                        
                     </tr>
                 <?php endforeach; ?>
             </tbody>

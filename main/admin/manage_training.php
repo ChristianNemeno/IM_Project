@@ -7,18 +7,26 @@ require_once('auth_check.php'); // Ensure user is logged in and is a Manager
 $success_message = '';
 $error_message = '';
 if (isset($_GET['status'])) {
-    // Example: Handle status messages from future actions
-    // switch ($_GET['status']) {
-    //     case 'scheduled': $success_message = "Training session scheduled successfully!"; break;
-    //     case 'updated': $success_message = "Training session updated successfully!"; break;
-    //     case 'cancelled': $success_message = "Training session cancelled successfully!"; break;
-    //     case 'error': $error_message = "An error occurred."; break;
-    // }
+    switch ($_GET['status']) {
+        case 'scheduled':
+            $success_message = "Training session scheduled successfully!";
+            if (isset($_GET['id'])) {
+                 $success_message .= " (ID: " . htmlspecialchars($_GET['id']) . ")";
+            }
+            break;
+        case 'updated': // Add this case
+            $success_message = "Training session updated successfully!";
+             if (isset($_GET['id'])) {
+                 $success_message .= " (ID: " . htmlspecialchars($_GET['id']) . ")";
+             }
+            break;
+        case 'not_found': // Keep this for other pages redirecting here
+            $error_message = "Training session not found.";
+             break;
+        // case 'cancelled': $success_message = "Training session cancelled successfully!"; break; // Placeholder
+        // case 'error': $error_message = "An error occurred."; break; // Placeholder
+    }
 }
-if (isset($_GET['error'])) {
-     $error_message = htmlspecialchars(urldecode($_GET['error']));
-}
-
 
 // Fetch all training sessions
 $sessions = getAllTrainingSessionsAdmin();

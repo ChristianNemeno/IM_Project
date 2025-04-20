@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 16, 2025 at 07:43 PM
+-- Generation Time: Apr 20, 2025 at 11:11 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -104,7 +104,8 @@ CREATE TABLE `tblmanager` (
 --
 
 INSERT INTO `tblmanager` (`manager_id`) VALUES
-(6);
+(6),
+(10);
 
 -- --------------------------------------------------------
 
@@ -169,6 +170,7 @@ CREATE TABLE `tblpet` (
   `age` int(11) DEFAULT NULL,
   `health_status` varchar(100) DEFAULT NULL,
   `adoption_status` enum('Available','Adopted') DEFAULT NULL,
+  `pet_image` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -177,13 +179,14 @@ CREATE TABLE `tblpet` (
 -- Dumping data for table `tblpet`
 --
 
-INSERT INTO `tblpet` (`pet_id`, `name`, `breed_id`, `age`, `health_status`, `adoption_status`, `created_at`, `updated_at`) VALUES
-(1, 'Buddy', 1, 2, 'Good', 'Available', '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
-(2, 'Max', 2, 3, 'Excellent', 'Adopted', '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
-(3, 'Bella', 3, 1, 'Fair', 'Available', '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
-(4, 'Whiskers', 4, 4, 'Good', 'Available', '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
-(5, 'Shadow', 5, 2, 'Excellent', 'Adopted', '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
-(6, 'Luna', 1, 3, 'Good', 'Available', '2025-04-11 05:08:09', '2025-04-11 05:08:09');
+INSERT INTO `tblpet` (`pet_id`, `name`, `breed_id`, `age`, `health_status`, `adoption_status`, `pet_image`, `created_at`, `updated_at`) VALUES
+(1, 'Buddy', 1, 2, 'Good', 'Available', NULL, '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
+(2, 'Max', 2, 3, 'Excellent', 'Adopted', NULL, '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
+(3, 'Bella', 3, 1, 'Fair', 'Available', NULL, '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
+(4, 'Whiskers', 4, 4, 'Good', 'Available', NULL, '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
+(5, 'Shadow', 5, 2, 'Excellent', 'Adopted', NULL, '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
+(6, 'Luna', 1, 3, 'Good', 'Available', NULL, '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
+(7, 'Christian', 3, 12, 'Excellent', 'Available', '0c656b0281cc7d499ffb2b49ca8ecc63.png', '2025-04-17 12:42:11', '2025-04-17 12:42:11');
 
 -- --------------------------------------------------------
 
@@ -418,7 +421,7 @@ ALTER TABLE `tblmedicalrecord`
 -- AUTO_INCREMENT for table `tblpet`
 --
 ALTER TABLE `tblpet`
-  MODIFY `pet_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `pet_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `tblspecies`
