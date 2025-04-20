@@ -5,19 +5,19 @@ require_once('auth_check.php'); // Ensure user is logged in and is a Manager
 // --- Initial Setup & Data Fetching ---
 $session_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 $details = null;
-$error_message = '';
+$error_message = ''; // Note: Errors from this page usually cause redirects
 
 if (!$session_id) {
-    header("Location: manage_training.php?error=" . urlencode("Invalid Session ID provided.")); //
+    header("Location: manage_training.php?error=" . urlencode("Invalid Session ID provided."));
     exit();
 }
 
-// Fetch session details using the new function
+// Fetch session details using the function
 $details = getTrainingSessionDetailsAdmin($session_id);
 
 if (!$details) {
     // Session record not found, redirect back with an error
-    header("Location: manage_training.php?status=not_found"); //
+    header("Location: manage_training.php?status=not_found");
     exit();
 }
 
@@ -27,7 +27,7 @@ require_once('partials/header.php'); // Include header
 
 <h1><?php echo $pageTitle; ?></h1>
 
-<?php if ($error_message): // Should not normally be set as errors cause redirects ?>
+<?php if ($error_message): /* Should not normally be set */ ?>
     <div class="message error-message"><?php echo htmlspecialchars($error_message); ?></div>
 <?php endif; ?>
 
@@ -80,39 +80,18 @@ require_once('partials/header.php'); // Include header
         <a href="edit_training.php?id=<?php echo $session_id; ?>" class="admin-button" style="margin-left: 10px;">
              <i class="fas fa-edit" style="margin-right: 5px;"></i> Edit Session
         </a>
+        <form action="manage_training.php" method="POST" style="display: inline; margin-left: 10px;" onsubmit="return confirm('Are you sure you want to delete this training session? This cannot be undone.');">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="session_id" value="<?php echo $session_id; ?>">
+            <button type="submit" class="admin-button" style="background-color: var(--tertiary-accent); border-color: var(--tertiary-accent); color: var(--primary-text);">
+                <i class="fas fa-trash-alt" style="margin-right: 5px;"></i> Delete Session
+            </button>
+        </form>
     </div>
 
 </div>
 
-<style>
-    .details-container h2 {
-        color: var(--primary-accent);
-        border-bottom: 1px solid var(--divider-border);
-        padding-bottom: 0.5rem;
-        margin-bottom: 1rem;
-        font-size: 1.3rem;
-    }
-    .detail-group p {
-        margin-bottom: 0.7rem;
-        line-height: 1.6;
-        font-size: 0.95rem;
-    }
-    .detail-group p strong {
-        color: var(--secondary-text);
-        min-width: 150px;
-        display: inline-block; /* Helps align */
-    }
-    .detail-group a {
-        color: var(--secondary-accent);
-        text-decoration: none;
-    }
-     .detail-group a:hover {
-        text-decoration: underline;
-    }
-     .pet-detail-group {
-         min-height: 110px; /* Ensure enough space for floating image */
-     }
-</style>
+
 
 
 <?php

@@ -562,6 +562,138 @@ function getAllUsersAdmin() {
     if ($conn) $conn->close();
     return $users;
 }
+/**
+ * Fetches the most recently registered users for the admin dashboard.
+ * @param int $limit The maximum number of recent users to return. Default is 5.
+ * @return array A list of associative arrays, each containing user details, or empty array on error.
+ */
+function getRecentUsersAdmin($limit = 5) {
+    $conn = getDbConnection();
+    $recentUsers = [];
+    if (!$conn) return $recentUsers;
+
+    $limit = max(1, (int)$limit); // Ensure limit is positive integer
+
+    $sql = "SELECT user_id, name, email, user_type, created_at
+            FROM tbluser
+            ORDER BY created_at DESC, user_id DESC
+            LIMIT ?"; // Use placeholder for limit
+
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt) {
+        try {
+            $stmt->bind_param("i", $limit);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) {
+                $recentUsers[] = $row;
+            }
+        } catch (Exception $e) {
+            error_log("Error fetching recent users admin: " . $e->getMessage());
+            $recentUsers = []; // Reset on error
+        } finally {
+            $stmt->close();
+        }
+    } else {
+        error_log("Prepare failed for getRecentUsersAdmin: (" . $conn->errno . ") " . $conn->error);
+    }
+
+    if ($conn) $conn->close();
+    return $recentUsers;
+}
+
+/**
+ * Gets the count of personnel users by their specific role (Manager, Trainer, Staff).
+ * @return array Associative array with roles as keys and counts as values (e.g., ['Manager' => 2, 'Trainer' => 3, 'Staff' => 5]). Returns empty array on error.
+ */
+function getPersonnelRoleCounts() {
+    $conn = getDbConnection();
+    $roleCounts = ['Manager' => 0, 'Trainer' => 0, 'Staff' => 0]; // Initialize counts
+    if (!$conn) return []; // Return empty on connection failure
+
+    // Query to count personnel and determine roles
+    // We count total personnel first, then managers and trainers, and deduce staff.
+    $sql_total_personnel = "SELECT COUNT(*) as total FROM tblpersonnel";
+    $sql_managers = "SELECT COUNT(*) as total FROM tblmanager";
+    $sql_trainers = "SELECT COUNT(*) as total FROM tbltrainer";
+
+    try {
+        // Get total personnel
+        $result_total = $conn->query($sql_total_personnel);
+        $totalPersonnel = ($result_total) ? $result_total->fetch_assoc()['total'] : 0;
+        if ($result_total) $result_total->free();
+
+        // Get total managers
+        $result_managers = $conn->query($sql_managers);
+        $roleCounts['Manager'] = ($result_managers) ? $result_managers->fetch_assoc()['total'] : 0;
+         if ($result_managers) $result_managers->free();
+
+        // Get total trainers
+        $result_trainers = $conn->query($sql_trainers);
+        $roleCounts['Trainer'] = ($result_trainers) ? $result_trainers->fetch_assoc()['total'] : 0;
+         if ($result_trainers) $result_trainers->free();
+
+        // Calculate Staff count (Total Personnel - Managers - Trainers)
+        // Ensure count doesn't go below zero due to potential data inconsistency
+        $roleCounts['Staff'] = max(0, $totalPersonnel - $roleCounts['Manager'] - $roleCounts['Trainer']);
+
+    } catch (Exception $e) {
+        error_log("Error fetching personnel role counts: " . $e->getMessage());
+        return []; // Return empty array on error
+    } finally {
+        if ($conn) $conn->close();
+    }
+
+    return $roleCounts;
+}
+
+/**
+ * Gets the most common pet breeds based on the count in the tblpet table.
+ * @param int $limit The maximum number of top breeds to return. Default is 5.
+ * @return array A list of associative arrays, each containing 'breed_name' and 'count', or empty array on error.
+ */
+function getTopBreeds($limit = 5) {
+    $conn = getDbConnection();
+    $topBreeds = [];
+    if (!$conn) return $topBreeds;
+
+    // Ensure limit is a positive integer
+    $limit = max(1, (int)$limit);
+
+    $sql = "SELECT b.breed_name, COUNT(p.pet_id) as count
+            FROM tblpet p
+            JOIN tblbreed b ON p.breed_id = b.breed_id
+            GROUP BY b.breed_id, b.breed_name
+            ORDER BY count DESC
+            LIMIT ?"; // Use placeholder for limit
+
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt) {
+        try {
+            $stmt->bind_param("i", $limit); // Bind the limit parameter
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) {
+                $topBreeds[] = $row;
+            }
+        } catch (Exception $e) {
+            error_log("Error fetching top breeds: " . $e->getMessage());
+            $topBreeds = []; // Reset on error
+        } finally {
+            $stmt->close();
+        }
+    } else {
+        error_log("Prepare failed for getTopBreeds: (" . $conn->errno . ") " . $conn->error);
+    }
+
+    if ($conn) $conn->close();
+    return $topBreeds;
+}
+
+
+
 // --- Adoption Management Functions ---
 
 /**
@@ -610,6 +742,167 @@ function getAllAdoptionsAdmin() {
 
     if ($conn) $conn->close();
     return $adoptions;
+}
+
+/**
+ * Fetches adoption counts grouped by month for the last N months.
+ * @param int $months The number of past months to include (e.g., 6 or 12). Default is 6.
+ * @return array An associative array where keys are 'YYYY-MM' and values are adoption counts, ordered chronologically. Returns empty array on error.
+ */
+function getAdoptionMonthlyTrends($months = 6) {
+    $conn = getDbConnection();
+    $trends = [];
+    if (!$conn) return $trends;
+
+    $months = max(1, (int)$months); // Ensure months is positive
+
+    // Calculate the date N months ago
+    $startDate = date('Y-m-01', strtotime("-$months months +1 month")); // Start from the beginning of the first month in the range
+
+    $sql = "SELECT
+                DATE_FORMAT(adoption_date, '%Y-%m') AS month_year,
+                COUNT(*) AS count
+            FROM tbladoptionrecord
+            WHERE adoption_date >= ? -- Filter for the last N months
+            GROUP BY month_year
+            ORDER BY month_year ASC"; // Order chronologically for the chart
+
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt) {
+        try {
+            $stmt->bind_param("s", $startDate);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) {
+                $trends[$row['month_year']] = $row['count'];
+            }
+        } catch (Exception $e) {
+            error_log("Error fetching adoption monthly trends: " . $e->getMessage());
+            $trends = []; // Reset on error
+        } finally {
+            $stmt->close();
+        }
+    } else {
+        error_log("Prepare failed for getAdoptionMonthlyTrends: (" . $conn->errno . ") " . $conn->error);
+    }
+
+    // --- Fill missing months with 0 counts ---
+    $filledTrends = [];
+    $currentDate = new DateTime($startDate);
+    $endDate = new DateTime(date('Y-m-01')); // Start of the current month
+
+    while ($currentDate <= $endDate) {
+        $monthKey = $currentDate->format('Y-m');
+        $filledTrends[$monthKey] = isset($trends[$monthKey]) ? $trends[$monthKey] : 0;
+        $currentDate->modify('+1 month'); // Move to the next month
+    }
+     // Ensure the current month is included if there's data for it but it wasn't in the loop range yet
+     $currentMonthKey = date('Y-m');
+     if (isset($trends[$currentMonthKey]) && !isset($filledTrends[$currentMonthKey])) {
+        $filledTrends[$currentMonthKey] = $trends[$currentMonthKey];
+     }
+     // Limit again just in case the date logic included an extra future month accidentally
+     $filledTrends = array_slice($filledTrends, -$months, $months, true);
+
+
+    if ($conn) $conn->close();
+    return $filledTrends; // Return chronologically ordered data with zeros for missing months
+}// remove this
+
+/**
+ * Gets the count of pets grouped by their adoption status.
+ * @return array An associative array where keys are statuses ('Available', 'Adopted', 'Pending')
+ * and values are the counts. Returns empty array on error.
+ * Includes all statuses defined in the ENUM/checks, even if count is 0.
+ */
+function getPetStatusCounts() {
+    $conn = getDbConnection();
+    // Initialize with all possible statuses defined in edit_pet.php/database ENUM
+    $statusCounts = ['Available' => 0, 'Adopted' => 0, 'Pending' => 0];
+    if (!$conn) return []; // Return empty array on connection failure
+
+    $sql = "SELECT adoption_status, COUNT(*) as count
+            FROM tblpet
+            WHERE adoption_status IN ('Available', 'Adopted', 'Pending') -- Ensure only valid statuses are counted
+            GROUP BY adoption_status";
+
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt) {
+        try {
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) {
+                // Overwrite the initialized count if found in DB
+                if (array_key_exists($row['adoption_status'], $statusCounts)) {
+                    $statusCounts[$row['adoption_status']] = $row['count'];
+                }
+            }
+        } catch (Exception $e) {
+            error_log("Error fetching pet status counts: " . $e->getMessage());
+            return []; // Return empty array on error
+        } finally {
+            $stmt->close();
+        }
+    } else {
+        error_log("Prepare failed for getPetStatusCounts: (" . $conn->errno . ") " . $conn->error);
+         return []; // Return empty array on error
+    }
+
+    if ($conn) $conn->close();
+    // Return the array, including statuses with 0 counts
+    return $statusCounts;
+}
+/**
+ * Fetches the most recent adoption records for the admin dashboard.
+ * @param int $limit The maximum number of recent adoptions to return. Default is 5.
+ * @return array A list of associative arrays, each containing adoption details, or empty array on error.
+ */
+function getRecentAdoptionsAdmin($limit = 5) {
+    $conn = getDbConnection();
+    $recentAdoptions = [];
+    if (!$conn) return $recentAdoptions;
+
+    $limit = max(1, (int)$limit); // Ensure limit is positive integer
+
+    // Fetch recent adoption records joining pet and user tables for names
+    $sql = "SELECT
+                ar.adoption_id,
+                ar.adoption_date,
+                p.name AS pet_name,
+                p.pet_id,
+                u.name AS adopter_name,
+                u.user_id AS adopter_user_id
+            FROM tbladoptionrecord ar
+            JOIN tblpet p ON ar.pet_id = p.pet_id
+            JOIN tbladopter a ON ar.adopter_id = a.adopter_id
+            JOIN tbluser u ON a.adopter_id = u.user_id
+            ORDER BY ar.adoption_date DESC, ar.adoption_id DESC
+            LIMIT ?"; // Use placeholder for limit
+
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt) {
+        try {
+            $stmt->bind_param("i", $limit);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) {
+                $recentAdoptions[] = $row;
+            }
+        } catch (Exception $e) {
+            error_log("Error fetching recent adoptions admin: " . $e->getMessage());
+            $recentAdoptions = []; // Reset on error
+        } finally {
+            $stmt->close();
+        }
+    } else {
+        error_log("Prepare failed for getRecentAdoptionsAdmin: (" . $conn->errno . ") " . $conn->error);
+    }
+
+    if ($conn) $conn->close();
+    return $recentAdoptions;
 }
 
 /**
@@ -979,6 +1272,51 @@ function getAdoptionDetailsAdmin($adoption_id) {
     if ($conn) $conn->close();
     return $details;
 }
+/**
+ * Gets the count of training sessions per trainer within the last 30 days.
+ * @return array An associative array where keys are trainer names and values are session counts, or empty array on error.
+ */
+function getTrainingLoadStats() {
+    $conn = getDbConnection();
+    $trainingLoad = [];
+    if (!$conn) return $trainingLoad;
+
+    // Get the date 30 days ago
+    $startDate = date('Y-m-d', strtotime("-30 days"));
+
+    // Query to count sessions per trainer in the last 30 days
+    $sql = "SELECT u.name AS trainer_name, COUNT(ts.session_id) AS session_count
+            FROM tbltrainingsession ts
+            JOIN tbltrainer t ON ts.trainer_id = t.trainer_id
+            JOIN tbluser u ON t.trainer_id = u.user_id
+            WHERE ts.date >= ? -- Filter for the last 30 days
+            GROUP BY ts.trainer_id, u.name
+            ORDER BY session_count DESC, trainer_name ASC"; // Order by count, then name
+
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt) {
+        try {
+            $stmt->bind_param("s", $startDate);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) {
+                // Use trainer name as the key and count as the value
+                $trainingLoad[$row['trainer_name']] = $row['session_count'];
+            }
+        } catch (Exception $e) {
+            error_log("Error fetching training load stats: " . $e->getMessage());
+            $trainingLoad = []; // Reset on error
+        } finally {
+            $stmt->close();
+        }
+    } else {
+        error_log("Prepare failed for getTrainingLoadStats: (" . $conn->errno . ") " . $conn->error);
+    }
+
+    if ($conn) $conn->close();
+    return $trainingLoad;
+}
 
 /**
  * Fetches detailed information for a specific training session.
@@ -1037,6 +1375,7 @@ function getTrainingSessionDetailsAdmin($session_id) {
 
     if ($conn) $conn->close();
     return $details;
+
 }
 
 /**

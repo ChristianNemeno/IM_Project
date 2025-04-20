@@ -3,9 +3,36 @@
 $pageTitle = "Manage Training Sessions"; // Set page title
 require_once('auth_check.php'); // Ensure user is logged in and is a Manager
 
-// --- Handle Messages Passed via GET (Placeholder) ---
+// --- Initialize Messages ---
 $success_message = '';
 $error_message = '';
+
+// --- Handle POST Request for Deletion ---
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'delete') {
+    // --- IMPORTANT: Add CSRF token validation here! ---
+    // Example: if (!validateCsrfToken($_POST['csrf_token'])) { die('Invalid CSRF Token'); }
+
+    $session_id_to_delete = filter_input(INPUT_POST, 'session_id', FILTER_VALIDATE_INT);
+
+    if ($session_id_to_delete) {
+        $deleted = deleteTrainingSession($session_id_to_delete);
+        if ($deleted) {
+            // Redirect to avoid form resubmission on refresh
+            header("Location: manage_training.php?status=deleted");
+            exit();
+        } else {
+            // Redirect with error
+            header("Location: manage_training.php?status=delete_failed");
+            exit();
+        }
+    } else {
+        // Invalid ID posted
+        header("Location: manage_training.php?error=" . urlencode("Invalid Session ID for deletion."));
+        exit();
+    }
+}
+
+// --- Handle Messages Passed via GET ---
 if (isset($_GET['status'])) {
     switch ($_GET['status']) {
         case 'scheduled':
@@ -14,19 +41,28 @@ if (isset($_GET['status'])) {
                  $success_message .= " (ID: " . htmlspecialchars($_GET['id']) . ")";
             }
             break;
-        case 'updated': // Add this case
+        case 'updated':
             $success_message = "Training session updated successfully!";
              if (isset($_GET['id'])) {
                  $success_message .= " (ID: " . htmlspecialchars($_GET['id']) . ")";
              }
             break;
+        case 'deleted': // Added case for successful deletion
+            $success_message = "Training session deleted successfully!";
+            break;
+        case 'delete_failed': // Added case for failed deletion
+             $error_message = "Failed to delete training session. Please try again.";
+             break;
         case 'not_found': // Keep this for other pages redirecting here
             $error_message = "Training session not found.";
              break;
-        // case 'cancelled': $success_message = "Training session cancelled successfully!"; break; // Placeholder
         // case 'error': $error_message = "An error occurred."; break; // Placeholder
     }
 }
+if (isset($_GET['error'])) { // Handle general errors passed via GET
+    $error_message = htmlspecialchars(urldecode($_GET['error']));
+}
+
 
 // Fetch all training sessions
 $sessions = getAllTrainingSessionsAdmin();
@@ -47,7 +83,7 @@ require_once('partials/header.php');
 
 <div class="admin-table-section">
     <div style="margin-bottom: 1rem; text-align: right;">
-        <a href="schedule_training.php" class="admin-button" title="Schedule New Session (Not Implemented)">Schedule New Session</a>
+        <a href="schedule_training.php" class="admin-button" title="Schedule New Session">Schedule New Session</a>
     </div>
 
     <?php if (empty($sessions)): ?>
@@ -75,7 +111,7 @@ require_once('partials/header.php');
                             </a>
                         </td>
                         <td>
-                             <a href="manage_users.php#user-<?php echo $session['trainer_user_id']; ?>" title="View Trainer Details (Requires modification in manage_users.php)">
+                             <a href="edit_user.php?id=<?php echo $session['trainer_user_id']; ?>" title="View/Edit Trainer">
                                 <?php echo htmlspecialchars($session['trainer_name']); ?>
                             </a>
                         </td>
@@ -83,9 +119,14 @@ require_once('partials/header.php');
                         <td><?php echo date('M d, Y', strtotime($session['date'])); ?></td>
                         <td><?php echo $session['duration']; ?></td>
                         <td class="actions">
-                            <a href="view_training_details.php?id=<?php echo $session['session_id']; ?>" class="action-btn view" title="View Details (Not Implemented)">Details</a>
-                            <a href="edit_training.php?id=<?php echo $session['session_id']; ?>" class="action-btn edit" title="Edit Session (Not Implemented)">Edit</a>
-                            </td>
+                            <a href="view_training_details.php?id=<?php echo $session['session_id']; ?>" class="action-btn view" title="View Details">Details</a>
+                            <a href="edit_training.php?id=<?php echo $session['session_id']; ?>" class="action-btn edit" title="Edit Session">Edit</a>
+                            <form action="manage_training.php" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this training session? This cannot be undone.');">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="session_id" value="<?php echo $session['session_id']; ?>">
+                                <button type="submit" class="action-btn delete" title="Delete Session">Delete</button>
+                            </form>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -97,12 +138,3 @@ require_once('partials/header.php');
 // Include footer
 require_once('partials/footer.php');
 ?>
-```
-
-**How to Use:**
-
-1.  Add the `getAllTrainingSessionsAdmin()` function to your `admin/admin_logic.php` file.
-2.  Save the second code block as `manage_training.php` inside your `/admin` directory.
-3.  Navigate to `yourdomain.com/admin/manage_training.php` (while logged in as Manager).
-
-This page will display a table of all recorded training sessions, showing the pet, trainer, type, date, and duration. Placeholder links for scheduling and actions (Details, Edit) are included for future implementati

@@ -1,0 +1,74 @@
+/* Styles originally inline in admin/index.php */
+
+.dashboard-grid-visualization {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Adjust min size */
+    gap: 1.5rem; /* Adjust gap */
+    align-items: start;
+}
+.dashboard-section {
+    background-color: var(--surface-bg);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--divider-border);
+    margin-bottom: 0;
+}
+.dashboard-section h2 {
+    font-size: 1.25rem; font-weight: 600; color: var(--primary-text);
+    margin-top: 0; margin-bottom: 1.25rem; padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--divider-border);
+}
+/* Styles for charts */
+.chart-section {
+     /* Let charts flow naturally in the grid */
+     /* Example: Adoption chart might be wider if desired */
+     /* grid-column: span 2; */ /* Uncomment to make a chart wider */
+}
+ .adoption-chart-section {
+     /* Example: force adoption chart to span if needed */
+     /* grid-column: 1 / -1; */
+ }
+.chart-container {
+    position: relative;
+    width: 100%;
+    margin-top: 1rem;
+}
+/* Other existing styles for tables, lists, quick actions... */
+.condensed-table th, .condensed-table td { padding: 0.6rem 0.9rem; font-size: 0.85rem; }
+.condensed-table th { background-color: rgba(0,0,0,0.25); }
+.condensed-table td:last-child { text-align: right; font-weight: 600; color: var(--primary-text); }
+.quick-actions-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.8rem; }
+.quick-action-card { padding: 1rem 0.5rem; }
+.action-icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
+.action-title { font-size: 0.85rem; }
+.data-list { list-style: none; padding: 0; margin: 0; }
+.data-list li { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid var(--divider-border); font-size: 0.9rem; color: var(--secondary-text); gap: 1rem; flex-wrap: wrap; }
+.data-list li:last-child { border-bottom: none; }
+.data-list .list-count { font-weight: 600; color: var(--primary-text); background-color: rgba(187, 134, 252, 0.15); padding: 0.2rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem; white-space: nowrap; }
+.activity-list li {}
+.activity-details { flex-grow: 1; display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; line-height: 1.4; }
+.activity-details a { color: var(--secondary-accent); text-decoration: none; font-weight: 500; }
+.activity-details a:hover { text-decoration: underline; }
+.activity-meta { display: flex; align-items: center; gap: 0.75rem; font-size: 0.8rem; color: var(--secondary-text); flex-shrink: 0; margin-top: 0.25rem; }
+.activity-date { white-space: nowrap; }
+.details-link { color: var(--secondary-text); text-decoration: none; font-weight: normal; padding: 0.1rem 0.4rem; border: 1px solid var(--divider-border); border-radius: var(--radius-sm); transition: all 0.2s ease; }
+.details-link:hover { background-color: var(--secondary-bg); color: var(--primary-text); border-color: var(--secondary-text); }
+.list-icon { margin-right: 0.4rem; font-size: 1em; width: 1.1em; text-align: center; }
+
+
+@media (max-width: 992px) {
+     .dashboard-grid-visualization {
+         grid-template-columns: 1fr; /* Stack */
+     }
+     .chart-section {
+        grid-column: auto; /* Reset span */
+     }
+}
+ @media (max-width: 480px) {
+     .activity-list li { flex-direction: column; align-items: flex-start; }
+     .activity-meta { margin-top: 0.5rem; }
+     .data-list li { align-items: flex-start; }
+     .data-list .list-count { margin-top: 0.3rem; }
+     .chart-container { height: 220px; } /* Reduce chart height slightly */
+}

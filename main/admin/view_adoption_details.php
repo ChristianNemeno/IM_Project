@@ -88,36 +88,6 @@ require_once('partials/header.php'); // Include header
 
 </div>
 
-<style>
-    .details-container h2 {
-        color: var(--primary-accent);
-        border-bottom: 1px solid var(--divider-border);
-        padding-bottom: 0.5rem;
-        margin-bottom: 1rem;
-        font-size: 1.3rem;
-    }
-    .detail-group p {
-        margin-bottom: 0.7rem;
-        line-height: 1.6;
-        font-size: 0.95rem;
-    }
-    .detail-group p strong {
-        color: var(--secondary-text);
-        min-width: 150px;
-        display: inline-block; /* Helps align */
-    }
-    .detail-group a {
-        color: var(--secondary-accent);
-        text-decoration: none;
-    }
-     .detail-group a:hover {
-        text-decoration: underline;
-    }
-     .pet-detail-group {
-         min-height: 110px; /* Ensure enough space for floating image */
-     }
-</style>
-
 
 <?php
 // Include footer

@@ -99,31 +99,7 @@ require_once('partials/header.php');
     </form>
 </div>
 
-<style>
-/* Simple styling for checkbox group */
-.checkbox-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.5rem;
-}
-.checkbox-group input[type="checkbox"] {
-    margin-right: 0.5rem;
-    width: auto; /* Override general input width */
-    height: 1.2em;
-    width: 1.2em;
-    cursor: pointer;
-}
-.checkbox-label {
-    margin-bottom: 0 !important; /* Override general label margin */
-    font-weight: normal !important; /* Override general label weight */
-    cursor: pointer;
-}
-.admin-form-container small {
-    display: block;
-    margin-top: 0.5rem;
-    color: var(--gray-600);
-}
-</style>
+
 
 
 <?php
