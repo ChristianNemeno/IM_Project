@@ -732,6 +732,44 @@ function updateUserAdmin($user_id, $name, $phone, $email, $address) {
  * These are additions to training 
  */
 
+ /**
+ * Deletes a specific training session record.
+ * @param int $session_id The ID of the training session to delete.
+ * @return bool True on success, false on failure.
+ */
+function deleteTrainingSession($session_id) {
+    $conn = getDbConnection();
+    if (!$conn) return false;
+    $success = false;
+
+    $sql = "DELETE FROM tbltrainingsession WHERE session_id = ?";
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt) {
+        try {
+            $stmt->bind_param("i", $session_id);
+            if ($stmt->execute()) {
+                // Check if a row was actually deleted
+                $success = $stmt->affected_rows > 0;
+                 if (!$success) {
+                     error_log("No training session found with ID $session_id to delete, or delete failed without error.");
+                 }
+            } else {
+                 error_log("Execute failed for deleteTrainingSession (ID: $session_id): " . $stmt->error);
+            }
+        } catch (Exception $e) {
+             error_log("Error deleting training session (ID: $session_id): " . $e->getMessage());
+        } finally {
+            $stmt->close();
+        }
+    } else {
+         error_log("Prepare failed for deleteTrainingSession: (" . $conn->errno . ") " . $conn->error);
+    }
+
+    if ($conn) $conn->close();
+    return $success;
+}
+
 
 /**
  * Fetches all personnel who are designated as trainers.
