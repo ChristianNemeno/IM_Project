@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Escova INC.</title>
     <link rel="stylesheet" href="public/css/register.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
+    <link rel="stylesheet" href="public/css/login.css">
+    </head>
 <body>
-    <?php require_once('dashboard-logic.php'); 
+    <?php require_once('dashboard-logic.php');
 
     $registration_error = '';
     $registration_success = '';
@@ -38,7 +38,7 @@
 
         else {
             // Database operations as in original file
-            $conn = getDbConnection();
+            $conn = getDbConnection(); // Assuming getDbConnection() is defined in dashboard-logic.php or elsewhere
             if (!$conn) {
                  $registration_error = "Database connection error.";
             } else {
@@ -102,7 +102,7 @@
 
                 } catch (Exception $e) {
                     $conn->rollback(); 
-                    if (empty($registration_error)) {
+                    if (empty($registration_error)) { // Only set if not already set by a specific check like email exists
                          $registration_error = $e->getMessage() . " Please try again.";
                     }
                 } finally {
@@ -122,7 +122,6 @@
     <div class="page-container">
         <header class="logo-header">
             <div class="logo">
-                <i class="fas fa-brush"></i>
                 <span>Escova INC.</span>
             </div>
         </header>
@@ -133,20 +132,17 @@
 
             <?php if ($registration_error): ?>
                 <div class="message error-message" role="alert">
-                    <i class="fas fa-exclamation-circle"></i>
                     <?php echo htmlspecialchars($registration_error); ?>
                 </div>
             <?php endif; ?>
             
             <?php if ($registration_success): ?>
                 <div class="message success-message" role="alert">
-                    <i class="fas fa-check-circle"></i>
                     <?php echo htmlspecialchars($registration_success); ?>
                 </div>
                 <a href="login.php" class="submit-btn">
                     <span>Proceed to Login</span>
-                    <i class="fas fa-arrow-right"></i>
-                </a>
+                    </a>
             <?php endif; ?>
 
             <?php if (!$registration_success): // Hide form on success ?>
@@ -155,7 +151,6 @@
                         <div class="form-group">
                             <label for="name">Full Name</label>
                             <div class="input-with-icon">
-                                <i class="fas fa-user"></i>
                                 <input type="text" id="name" name="name" required value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>" placeholder="John Doe">
                             </div>
                         </div>
@@ -163,7 +158,6 @@
                         <div class="form-group">
                             <label for="phone">Phone</label>
                             <div class="input-with-icon">
-                                <i class="fas fa-phone"></i>
                                 <input type="tel" id="phone" name="phone" required value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>" placeholder="(123) 456-7890">
                             </div>
                         </div>
@@ -172,7 +166,6 @@
                     <div class="form-group">
                         <label for="email">Email Address</label>
                         <div class="input-with-icon">
-                            <i class="fas fa-envelope"></i>
                             <input type="email" id="email" name="email" required value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" placeholder="your@email.com">
                         </div>
                     </div>
@@ -180,7 +173,6 @@
                     <div class="form-group">
                         <label for="address">Address</label>
                         <div class="input-with-icon">
-                            <i class="fas fa-home"></i>
                             <input type="text" id="address" name="address" required value="<?php echo isset($_POST['address']) ? htmlspecialchars($_POST['address']) : ''; ?>" placeholder="123 Main St, City">
                         </div>
                     </div>
@@ -188,7 +180,6 @@
                     <div class="form-group">
                         <label for="user_type">Registering As</label>
                         <div class="input-with-icon select-wrapper">
-                            <i class="fas fa-user-tag"></i>
                             <select id="user_type" name="user_type" required>
                                 <option value="" disabled <?php echo empty($_POST['user_type']) ? 'selected' : ''; ?>>-- Select User Type --</option>
                                 <option value="Adopter" <?php echo (isset($_POST['user_type']) && $_POST['user_type'] == 'Adopter') ? 'selected' : ''; ?>>Adopter</option>
@@ -201,37 +192,31 @@
                         <div class="form-group">
                             <label for="password">Password</label>
                             <div class="input-with-icon">
-                                <i class="fas fa-lock"></i>
                                 <input type="password" id="password" name="password" required placeholder="••••••••">
                                 <button type="button" class="toggle-password" data-target="password" aria-label="Show password">
-                                    <i class="fas fa-eye"></i>
-                                </button>
+                                    Show </button>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="confirm_password">Confirm Password</label>
                             <div class="input-with-icon">
-                                <i class="fas fa-lock"></i>
                                 <input type="password" id="confirm_password" name="confirm_password" required placeholder="••••••••">
                                 <button type="button" class="toggle-password" data-target="confirm_password" aria-label="Show password">
-                                    <i class="fas fa-eye"></i>
-                                </button>
+                                     Show </button>
                             </div>
                         </div>
                     </div>
 
                     <div class="password-requirements">
                         <div class="requirement">
-                            <i class="fas fa-info-circle"></i>
                             <span>Password must be at least 8 characters long</span>
                         </div>
                     </div>
 
                     <button type="submit" class="submit-btn">
                         <span>Create Account</span>
-                        <i class="fas fa-user-plus"></i>
-                    </button>
+                        </button>
                 </form>
 
                 <div class="login-link">
@@ -251,16 +236,20 @@
             button.addEventListener('click', function() {
                 const targetId = this.getAttribute('data-target');
                 const passwordInput = document.getElementById(targetId);
-                const icon = this.querySelector('i');
-                
+                // const icon = this.querySelector('i'); // Icon element is removed
+
                 if (passwordInput.type === 'password') {
                     passwordInput.type = 'text';
-                    icon.classList.remove('fa-eye');
-                    icon.classList.add('fa-eye-slash');
+                    this.textContent = 'Hide'; // Change button text
+                    this.setAttribute('aria-label', 'Hide password');
+                    // icon.classList.remove('fa-eye'); // Icon class manipulation removed
+                    // icon.classList.add('fa-eye-slash'); // Icon class manipulation removed
                 } else {
                     passwordInput.type = 'password';
-                    icon.classList.remove('fa-eye-slash');
-                    icon.classList.add('fa-eye');
+                    this.textContent = 'Show'; // Change button text
+                    this.setAttribute('aria-label', 'Show password');
+                    // icon.classList.remove('fa-eye-slash'); // Icon class manipulation removed
+                    // icon.classList.add('fa-eye'); // Icon class manipulation removed
                 }
             });
         });

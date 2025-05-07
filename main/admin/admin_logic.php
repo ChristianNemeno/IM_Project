@@ -192,6 +192,261 @@ function addPet($name, $breed_id, $age, $health_status, $adoption_status, $pet_i
  * @param string|null $pet_image The filename of the uploaded pet image, or null.
  * @return bool True on success, false on failure.
  */
+
+ function setPersonnelRole($user_id, $role) {
+    $conn = getDbConnection();
+    if (!$conn) {
+        error_log("setPersonnelRole: Failed to get DB connection.");
+        return false;
+    }
+
+    // First, verify the user is actually in tblpersonnel
+    $check_sql = "SELECT personnel_id FROM tblpersonnel WHERE personnel_id = ?";
+    $check_stmt = $conn->prepare($check_sql);
+    $is_personnel = false;
+    if ($check_stmt) {
+        $check_stmt->bind_param("i", $user_id);
+        $check_stmt->execute();
+        $check_stmt->store_result();
+        $is_personnel = $check_stmt->num_rows > 0;
+        $check_stmt->close();
+    } else {
+        error_log("Prepare failed for personnel check in setPersonnelRole: (" . $conn->errno . ") " . $conn->error);
+        if ($conn) $conn->close();
+        return false;
+    }
+
+    if (!$is_personnel) {
+        error_log("Attempted to set role for non-personnel user ID: $user_id");
+        if ($conn) $conn->close();
+        return false;
+    }
+
+    $conn->begin_transaction();
+    $success = false;
+
+    try {
+        // Always remove existing specific roles first to ensure clean state & exclusivity
+        $sql_remove_manager = "DELETE FROM tblmanager WHERE manager_id = ?";
+        $stmt_remove_manager = $conn->prepare($sql_remove_manager);
+        if (!$stmt_remove_manager) throw new Exception("Prepare failed for removing manager role.");
+        $stmt_remove_manager->bind_param("i", $user_id);
+        $stmt_remove_manager->execute();
+        $stmt_remove_manager->close();
+
+        $sql_remove_trainer = "DELETE FROM tbltrainer WHERE trainer_id = ?";
+        $stmt_remove_trainer = $conn->prepare($sql_remove_trainer);
+        if (!$stmt_remove_trainer) throw new Exception("Prepare failed for removing trainer role.");
+        $stmt_remove_trainer->bind_param("i", $user_id);
+        $stmt_remove_trainer->execute();
+        $stmt_remove_trainer->close();
+
+        // Now, add the new role if it's Manager or Trainer
+        if ($role === 'Manager') {
+            $sql_add_role = "INSERT INTO tblmanager (manager_id) VALUES (?)";
+            $stmt_add_role = $conn->prepare($sql_add_role);
+            if (!$stmt_add_role) throw new Exception("Prepare failed for adding manager role.");
+            $stmt_add_role->bind_param("i", $user_id);
+            if (!$stmt_add_role->execute()) {
+                error_log("Execute failed adding manager role for user ID ($user_id): " . $stmt_add_role->error);
+                throw new Exception("Failed to assign manager role.");
+            }
+            $stmt_add_role->close();
+            $success = true;
+        } elseif ($role === 'Trainer') {
+            $sql_add_role = "INSERT INTO tbltrainer (trainer_id, specialization, experience_years) VALUES (?, NULL, NULL)"; // Add default/NULL specialization & experience
+            $stmt_add_role = $conn->prepare($sql_add_role);
+            if (!$stmt_add_role) throw new Exception("Prepare failed for adding trainer role.");
+            $stmt_add_role->bind_param("i", $user_id);
+            if (!$stmt_add_role->execute()) {
+                error_log("Execute failed adding trainer role for user ID ($user_id): " . $stmt_add_role->error);
+                throw new Exception("Failed to assign trainer role.");
+            }
+            $stmt_add_role->close();
+            $success = true;
+        } elseif ($role === 'Staff') {
+            // No specific table entry for 'Staff', just ensure they are not Manager or Trainer (done above)
+            $success = true;
+        } else {
+            throw new Exception("Invalid role specified: " . htmlspecialchars($role));
+        }
+
+        $conn->commit();
+
+    } catch (Exception $e) {
+        error_log("Error setting personnel role for user ID ($user_id) to '$role': " . $e->getMessage());
+        $conn->rollback();
+        $success = false;
+    } finally {
+        if ($conn) $conn->close();
+    }
+
+    return $success;
+}
+
+
+function getAdoptionRequestsAdmin($status = null) {
+    $conn = getDbConnection();
+    if (!$conn) return [];
+    $requests = [];
+
+    $sql = "SELECT ar.request_id, ar.request_date, ar.status, ar.adopter_message, ar.admin_notes,
+                   p.pet_id, p.name AS pet_name, p.pet_image,
+                   u.user_id AS adopter_user_id, u.name AS adopter_name, u.email AS adopter_email,
+                   admin_u.name AS processed_by_admin_name
+            FROM tbladoptionrequest ar
+            JOIN tblpet p ON ar.pet_id = p.pet_id
+            JOIN tbluser u ON ar.adopter_user_id = u.user_id
+            LEFT JOIN tbluser admin_u ON ar.processed_by_admin_id = admin_u.user_id";
+
+    $params = [];
+    $types = "";
+
+    if ($status !== null && in_array($status, ['Pending', 'Approved', 'Rejected', 'Cancelled'])) {
+        $sql .= " WHERE ar.status = ?";
+        $params[] = $status;
+        $types .= "s";
+    }
+    $sql .= " ORDER BY ar.request_date DESC";
+
+    $stmt = $conn->prepare($sql);
+    if ($stmt) {
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $requests[] = $row;
+            }
+            $result->free();
+        } else {
+            error_log("Error fetching adoption requests: " . $stmt->error);
+        }
+        $stmt->close();
+    } else {
+        error_log("Prepare failed for getAdoptionRequestsAdmin: " . $conn->error);
+    }
+    $conn->close();
+    return $requests;
+}
+
+/**
+ * Updates the status of an adoption request and related pet status.
+ *
+ * @param int $request_id The ID of the adoption request.
+ * @param string $new_status The new status ('Approved', 'Rejected', 'Cancelled').
+ * @param int $admin_user_id The ID of the admin processing the request.
+ * @param string|null $admin_notes Optional notes from the admin.
+ * @return bool True on success, false on failure.
+ */
+function processAdoptionRequest($request_id, $new_status, $admin_user_id, $admin_notes = null) {
+    $conn = getDbConnection();
+    if (!$conn) return false;
+
+    // Fetch pet_id from the request first
+    $pet_id = null;
+    $stmt_get_pet = $conn->prepare("SELECT pet_id FROM tbladoptionrequest WHERE request_id = ?");
+    if ($stmt_get_pet) {
+        $stmt_get_pet->bind_param("i", $request_id);
+        $stmt_get_pet->execute();
+        $result_pet = $stmt_get_pet->get_result();
+        if ($pet_row = $result_pet->fetch_assoc()) {
+            $pet_id = $pet_row['pet_id'];
+        }
+        $stmt_get_pet->close();
+    }
+
+    if (!$pet_id) {
+        error_log("Could not find pet_id for request_id: $request_id");
+        $conn->close();
+        return false;
+    }
+
+    $conn->begin_transaction();
+    $success = false;
+
+    try {
+        // Update the adoption request
+        $sql_update_request = "UPDATE tbladoptionrequest
+                               SET status = ?, admin_notes = ?,
+                                   processed_by_admin_id = ?, processed_date = NOW()
+                               WHERE request_id = ?";
+        $stmt_request = $conn->prepare($sql_update_request);
+        if (!$stmt_request) throw new Exception("Prepare failed for updating request: " . $conn->error);
+
+        $stmt_request->bind_param("ssii", $new_status, $admin_notes, $admin_user_id, $request_id);
+        if (!$stmt_request->execute()) throw new Exception("Execute failed for updating request: " . $stmt_request->error);
+        $stmt_request->close();
+
+        // If approved, update pet's adoption_status and create final adoption record
+        if ($new_status === 'Approved') {
+            // Update pet status to 'Adopted'
+            $sql_update_pet = "UPDATE tblpet SET adoption_status = 'Adopted' WHERE pet_id = ?";
+            $stmt_pet = $conn->prepare($sql_update_pet);
+            if (!$stmt_pet) throw new Exception("Prepare failed for updating pet status: " . $conn->error);
+            $stmt_pet->bind_param("i", $pet_id);
+            if (!$stmt_pet->execute()) throw new Exception("Execute failed for updating pet status: " . $stmt_pet->error);
+            $stmt_pet->close();
+
+            // Create a record in tbladoptionrecord (assuming this is for finalized adoptions)
+            // Fetch adopter_id and fee (fee might be 0 or handled differently)
+            $adopter_id_for_record = null;
+            $stmt_get_adopter = $conn->prepare("SELECT adopter_user_id FROM tbladoptionrequest WHERE request_id = ?");
+             if ($stmt_get_adopter) {
+                $stmt_get_adopter->bind_param("i", $request_id);
+                $stmt_get_adopter->execute();
+                $result_adopter = $stmt_get_adopter->get_result();
+                if ($adopter_row = $result_adopter->fetch_assoc()) {
+                    $adopter_id_for_record = $adopter_row['adopter_user_id'];
+                }
+                $stmt_get_adopter->close();
+            }
+            if (!$adopter_id_for_record) throw new Exception("Could not retrieve adopter ID for final record.");
+
+            // You might need a system for adoption fees or set it to 0 by default
+            $adoption_fee = 0.00; // Placeholder for adoption fee
+
+            $sql_insert_adoption = "INSERT INTO tbladoptionrecord (pet_id, adopter_id, adoption_date, fee_paid)
+                                    VALUES (?, ?, CURDATE(), ?)";
+            $stmt_insert_final = $conn->prepare($sql_insert_adoption);
+            if(!$stmt_insert_final) throw new Exception("Prepare failed for final adoption record: " . $conn->error);
+            $stmt_insert_final->bind_param("iid", $pet_id, $adopter_id_for_record, $adoption_fee);
+            if(!$stmt_insert_final->execute()) throw new Exception("Execute failed for final adoption record: " . $stmt_insert_final->error);
+            $stmt_insert_final->close();
+
+            // Optionally, reject other pending requests for the same pet
+            $sql_reject_others = "UPDATE tbladoptionrequest SET status = 'Rejected', admin_notes = 'Pet adopted by another applicant.'
+                                  WHERE pet_id = ? AND status = 'Pending' AND request_id != ?";
+            $stmt_reject = $conn->prepare($sql_reject_others);
+            if ($stmt_reject) {
+                $stmt_reject->bind_param("ii", $pet_id, $request_id);
+                $stmt_reject->execute(); // Execute but don't throw error if it fails (best effort)
+                $stmt_reject->close();
+            }
+
+        } elseif ($new_status === 'Rejected' || $new_status === 'Cancelled') {
+            // If a previously approved request is now rejected/cancelled,
+            // and the pet was marked 'Adopted' SOLELY due to this request,
+            // consider setting the pet back to 'Available'. This logic can be complex.
+            // For simplicity now, we only update the pet to 'Adopted' on approval.
+            // Reverting requires checking if other approved adoptions exist for this pet.
+        }
+
+        $conn->commit();
+        $success = true;
+
+    } catch (Exception $e) {
+        $conn->rollback();
+        error_log("Error processing adoption request (ID: $request_id): " . $e->getMessage());
+        $success = false;
+    } finally {
+        if ($conn) $conn->close();
+    }
+    return $success;
+}
+
 function updatePet($pet_id, $name, $breed_id, $age, $health_status, $adoption_status, $pet_image) { // Added $pet_image parameter
     $conn = getDbConnection();
    if (!$conn) return false;

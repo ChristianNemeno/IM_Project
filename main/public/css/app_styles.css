@@ -1,0 +1,792 @@
+/* main/public/css/app_styles.css */
+/* User Dashboard Styles - Dark Theme V2 (Improvements) */
+
+/* --- Font Import --- */
+@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&display=swap");
+
+/* --- Dark Theme Variables --- */
+:root {
+    /* Core Dark Theme Colors */
+    --primary-bg: #1e1e2f; /* Main dark background */
+    --secondary-bg: #27293d; /* Slightly lighter dark (used for content bg) */
+    --surface-bg: #2c2f48; /* Card/Section background */
+    --primary-text: #e1e1e6; /* Primary light text (slightly off-white) */
+    --secondary-text: #a9a9b3; /* Lighter gray text */
+    --primary-accent: #bb86fc; /* Purple accent */
+    --secondary-accent: #03dac6; /* Teal accent */
+    --tertiary-accent: #cf6679; /* Pinkish accent for alerts/logout */
+    --divider-border: rgba(255, 255, 255, 0.1); /* Subtle light border */
+
+    /* Status Colors (Adjusted slightly for potential contrast) */
+    --success: #50fa7b; /* Brighter Green */
+    --success-light: rgba(80, 250, 123, 0.15);
+    --warning: #f1fa8c; /* Yellowish */
+    --warning-light: rgba(241, 250, 140, 0.15);
+    --info: #8be9fd; /* Cyan */
+    --info-light: rgba(139, 233, 253, 0.15);
+    --adopted-color: var(--secondary-text); /* Color for adopted status text */
+    --adopted-bg: rgba(169, 169, 177, 0.15); /* Background for adopted status */
+
+    /* Radii and Shadows */
+    --radius-sm: 4px;
+    --radius: 6px; /* Slightly reduced radius */
+    --radius-lg: 10px;
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.15);
+    --shadow: 0 5px 8px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 8px 12px rgba(0, 0, 0, 0.25);
+
+    /* Typography */
+    --font-family-base: "Nunito Sans", -apple-system, BlinkMacSystemFont,
+        "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    --base-font-size: 16px; /* Adjust as needed */
+    --line-height-base: 1.6;
+
+    /* Transitions */
+    --transition-speed: 0.25s;
+    --transition-timing: ease-in-out;
+}
+
+/* --- Core Layout --- */
+*,
+*::before,
+*::after {
+    /* Apply box-sizing globally */
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-family-base);
+    font-size: var(--base-font-size);
+    background-color: var(
+        --secondary-bg
+    ); /* Use secondary dark for overall page bg */
+    color: var(--primary-text); /* Default text color */
+    line-height: var(--line-height-base);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.app-dashboard {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--secondary-bg);
+}
+
+/* --- Sidebar --- */
+.app-sidebar {
+    width: 260px;
+    background-color: var(--primary-bg); /* Darker sidebar */
+    color: var(--secondary-text); /* Use secondary text for sidebar */
+    padding: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    border-right: 1px solid var(--divider-border);
+    box-shadow: 3px 0 15px rgba(0, 0, 0, 0.25);
+    transition: width var(--transition-speed) var(--transition-timing);
+    overflow-x: hidden; /* Prevent horizontal scroll during collapse */
+    position: relative; /* For potential absolute positioning of elements inside */
+    z-index: 10; /* Ensure sidebar is above content background pattern */
+}
+
+.app-sidebar-header {
+    font-size: 1.4rem; /* Adjusted */
+    font-weight: 700;
+    color: var(--primary-accent); /* Purple accent for title */
+    margin-bottom: 2.5rem; /* Increased spacing */
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem; /* Increased gap */
+}
+.app-sidebar-header .logo {
+    color: var(--primary-accent); /* Ensure icon uses accent color */
+    font-size: 1.8rem; /* Adjust if needed */
+    transition: transform var(--transition-speed) var(--transition-timing);
+}
+.app-sidebar-header .logo:hover {
+    transform: rotate(-10deg);
+}
+.app-sidebar-header .sidebar-title-text {
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity var(--transition-speed) var(--transition-timing);
+}
+
+/* Navigation */
+.app-nav {
+    flex-grow: 1; /* Allow nav to take up space */
+    overflow-y: auto; /* Add scroll if nav items exceed height */
+}
+.app-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.app-nav .nav-item {
+    /* Target list item for spacing */
+    margin-bottom: 0.25rem;
+}
+
+.app-nav .nav-link {
+    /* Target the link */
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1.5rem; /* Adjusted padding */
+    color: var(--secondary-text);
+    text-decoration: none;
+    border-left: 4px solid transparent;
+    font-weight: 600; /* Slightly bolder */
+    font-size: 0.9rem; /* Adjusted */
+    margin: 0 0.75rem;
+    border-radius: var(--radius);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all var(--transition-speed) var(--transition-timing); /* Apply transition to all properties */
+    position: relative; /* For potential future ::before/::after effects */
+}
+
+.app-nav .nav-link i.fas {
+    margin-right: 0.9rem; /* Increased spacing */
+    width: 20px; /* Keep fixed width */
+    text-align: center;
+    font-size: 1.05em; /* Slightly smaller icon */
+    opacity: 0.7;
+    transition: opacity var(--transition-speed) var(--transition-timing),
+        color var(--transition-speed) var(--transition-timing); /* Smooth transitions */
+    flex-shrink: 0; /* Prevent icon from shrinking */
+}
+.app-nav .nav-link span {
+    opacity: 1;
+    transition: opacity var(--transition-speed) var(--transition-timing);
+}
+
+/* Hover state - Enhanced */
+.app-nav .nav-link:hover {
+    background-color: rgba(187, 134, 252, 0.1);
+    color: var(--primary-text);
+    border-left-color: var(--secondary-accent); /* Use Teal accent on hover */
+    transform: translateX(3px);
+}
+.app-nav .nav-link:hover i.fas {
+    opacity: 1;
+    color: var(--secondary-accent); /* Teal icon on hover */
+}
+
+/* Active state - Enhanced */
+.app-nav .nav-link.active {
+    background: linear-gradient(
+        90deg,
+        rgba(187, 134, 252, 0.2),
+        rgba(187, 134, 252, 0.1)
+    ); /* Subtle gradient */
+    color: var(--primary-accent); /* Purple text */
+    border-left-color: var(--primary-accent);
+    font-weight: 700; /* Bold active */
+}
+.app-nav .nav-link.active i.fas {
+    opacity: 1;
+    color: var(--primary-accent); /* Purple icon */
+}
+
+/* Sidebar Footer */
+.app-sidebar-footer {
+    margin-top: auto; /* Pushes to bottom */
+    padding: 1.2rem 1.5rem;
+    font-size: 0.85rem; /* Adjusted */
+    border-top: 1px solid var(--divider-border);
+    background-color: rgba(0, 0, 0, 0.15);
+    flex-shrink: 0; /* Prevent footer shrinking */
+}
+.app-sidebar-footer .user-info {
+    margin-bottom: 0.75rem;
+}
+.app-sidebar-footer .user-name {
+    font-weight: 700; /* Bolder name */
+    display: block;
+    color: var(--primary-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.app-sidebar-footer .user-role {
+    font-size: 0.75rem; /* Smaller role */
+    color: var(--secondary-text);
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+.app-sidebar-footer .logout-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    color: var(--tertiary-accent);
+    text-decoration: none;
+    border-radius: var(--radius);
+    transition: color var(--transition-speed) var(--transition-timing);
+    font-weight: 600;
+    white-space: nowrap; /* Prevent wrap */
+    overflow: hidden;
+}
+.app-sidebar-footer .logout-link:hover {
+    color: #ff8a9d;
+    text-decoration: underline;
+}
+.app-sidebar-footer .logout-link i.fas {
+    transition: transform var(--transition-speed) ease;
+    flex-shrink: 0;
+}
+.app-sidebar-footer .logout-link:hover i.fas {
+    transform: translateX(3px);
+}
+.app-sidebar-footer .logout-text {
+    transition: opacity var(--transition-speed) var(--transition-timing);
+    opacity: 1;
+    overflow: hidden; /* Hide text that overflows */
+    text-overflow: ellipsis;
+}
+
+/* --- Main Content --- */
+.app-main-content {
+    flex-grow: 1;
+    padding: 2rem 2.5rem;
+    overflow-y: auto;
+    background-color: var(--secondary-bg);
+    position: relative;
+    transition: padding-left var(--transition-speed) var(--transition-timing); /* Smooth transition if sidebar collapses */
+}
+
+/* Optional background pattern */
+.app-main-content::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: radial-gradient(
+            rgba(255, 255, 255, 0.015) 1px,
+            transparent 1px
+        ),
+        /* More subtle */
+            radial-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    background-size: 30px 30px; /* Larger pattern */
+    background-position: 0 0, 15px 15px;
+    pointer-events: none;
+    z-index: 0; /* Behind content */
+}
+/* Ensure content is above the pattern */
+.app-main-content > * {
+    position: relative;
+    z-index: 1;
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem; /* Increased spacing */
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--divider-border);
+}
+.content-header h1 {
+    color: var(--primary-text);
+    margin: 0;
+    font-size: 1.6rem; /* Adjusted size */
+    font-weight: 700;
+}
+
+/* --- Sections & Cards --- */
+.dashboard-section {
+    /* Style sections containing content */
+    background-color: var(
+        --surface-bg
+    ); /* Use surface color for cards/sections */
+    padding: 1.75rem 2rem; /* Adjusted padding */
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    margin-bottom: 2.5rem;
+    border: 1px solid var(--divider-border);
+}
+.dashboard-section h2 {
+    font-size: 1.15rem; /* Adjusted size */
+    font-weight: 700;
+    color: var(--primary-text); /* Light text for section headings */
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--divider-border);
+}
+
+/* Pet Cards - Refined */
+.pet-list-cards {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(270px, 1fr)
+    ); /* Slightly smaller min */
+    gap: 1.75rem; /* Increased gap */
+}
+.pet-list-card {
+    background: var(--surface-bg);
+    border-radius: var(--radius);
+    /* padding applied via inner div */
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--divider-border); /* Added border */
+    overflow: hidden; /* Ensure image radius works */
+    transition: transform var(--transition-speed) ease,
+        box-shadow var(--transition-speed) ease;
+}
+.pet-list-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md), 0 0 15px rgba(187, 134, 252, 0.1); /* Add subtle glow */
+}
+.pet-list-card img.pet-image {
+    width: 100%;
+    height: 220px; /* Increased height */
+    object-fit: cover;
+    border-radius: 0; /* Remove radius if it's top image */
+    margin-bottom: 0; /* Remove margin */
+    border: none; /* Remove border */
+    border-bottom: 1px solid var(--divider-border); /* Border below image */
+}
+.pet-card-content {
+    /* New div for padding */
+    padding: 1.25rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+.pet-list-card h3 {
+    font-size: 1.1rem; /* Adjusted */
+    font-weight: 700; /* Bolder */
+    color: var(--primary-text);
+    margin-bottom: 0.3rem;
+}
+.pet-list-card p {
+    font-size: 0.85rem; /* Adjusted */
+    color: var(--secondary-text);
+    margin-bottom: 0.6rem; /* Adjusted */
+    line-height: 1.5;
+}
+.pet-list-card .pet-info-main {
+    flex-grow: 1;
+}
+.pet-card-actions {
+    /* Container for buttons */
+    margin-top: auto; /* Push to bottom */
+    padding-top: 1rem; /* Space above buttons */
+    display: flex;
+    gap: 0.75rem; /* Space between buttons */
+    justify-content: flex-end; /* Align buttons right */
+}
+
+/* Buttons */
+.action-button {
+    /* Base button style */
+    display: inline-flex; /* Align icon and text */
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem; /* Adjusted padding */
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    font-weight: 600; /* Bolder */
+    font-size: 0.85rem; /* Adjusted */
+    cursor: pointer;
+    text-decoration: none;
+    transition: all var(--transition-speed) ease;
+    background-color: var(--primary-accent);
+    color: var(--primary-bg);
+    box-shadow: var(--shadow-sm);
+}
+.action-button i.fas {
+    /* Style icons inside buttons */
+    font-size: 0.9em; /* Slightly smaller than button text */
+}
+.action-button:hover {
+    opacity: 0.85;
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+}
+/* Variations */
+.action-button.secondary {
+    background-color: var(--surface-bg);
+    color: var(--secondary-text); /* Use secondary text */
+    border-color: var(--divider-border);
+}
+.action-button.secondary:hover {
+    background-color: var(--secondary-bg);
+    border-color: var(--secondary-text);
+    color: var(--primary-text);
+}
+.action-button.success {
+    background-color: var(--success);
+    color: var(--primary-bg); /* Dark text on bright green */
+    border-color: var(--success);
+}
+.action-button.success:hover {
+    opacity: 0.85;
+}
+/* Apply to specific buttons */
+.pet-list-card .action-button {
+    margin-top: 0; /* Reset margin from base */
+}
+.content-table td .action-button {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.7rem; /* Smaller table buttons */
+    margin-right: 0.5rem;
+}
+.content-table td .action-button:last-child {
+    margin-right: 0;
+}
+
+/* Table Styles */
+.content-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background-color: var(--surface-bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--divider-border);
+}
+.content-table th,
+.content-table td {
+    padding: 0.9rem 1.1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--divider-border);
+    font-size: 0.9rem;
+    vertical-align: middle;
+    color: var(--secondary-text);
+}
+.content-table th {
+    background-color: rgba(0, 0, 0, 0.15);
+    color: var(--primary-text);
+    font-weight: 700; /* Bolder headers */
+    white-space: nowrap;
+    font-size: 0.85rem; /* Slightly smaller header text */
+    text-transform: uppercase; /* Uppercase headers */
+    letter-spacing: 0.5px;
+}
+.content-table tbody tr {
+    transition: background-color var(--transition-speed) ease;
+}
+.content-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.04);
+}
+.content-table img {
+    /* Style images within tables */
+    vertical-align: middle; /* Align image nicely */
+}
+
+/* Status Badges */
+.health-status {
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem; /* Smaller badge text */
+    font-weight: 700; /* Bolder badge text */
+    display: inline-block;
+    text-transform: capitalize;
+    border: 1px solid transparent;
+    line-height: 1.3; /* Adjust line height */
+}
+/* Status Colors */
+.health-status.excellent,
+.health-status.available {
+    background-color: var(--success-light);
+    color: #a5d6a7;
+    border-color: var(--success);
+}
+.health-status.good {
+    background-color: var(--info-light);
+    color: #90caf9;
+    border-color: var(--info);
+}
+.health-status.fair {
+    background-color: var(--warning-light);
+    color: #ffcc80;
+    border-color: var(--warning);
+}
+.health-status.poor {
+    background-color: rgba(117, 117, 117, 0.2);
+    color: #e0e0e0;
+    border-color: #757575;
+}
+.health-status.adopted,
+.health-status.pending {
+    background-color: var(--adopted-bg);
+    color: var(--adopted-color);
+    border-color: var(--adopted-color);
+}
+
+/* Profile Page */
+.profile-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.75rem; /* Increased gap */
+}
+.profile-card {
+    background-color: var(--surface-bg);
+    padding: 1.75rem; /* Increased padding */
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--divider-border);
+}
+.profile-card h2 {
+    font-size: 1.1rem; /* Adjusted */
+    color: var(--primary-accent);
+    margin-top: 0;
+    margin-bottom: 1.25rem; /* Adjusted */
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--divider-border);
+}
+.profile-card p {
+    margin-bottom: 0.8rem;
+    line-height: 1.6;
+    color: var(--secondary-text);
+    font-size: 0.9rem; /* Ensure consistent text size */
+}
+.profile-card p strong {
+    color: var(--primary-text);
+    min-width: 110px; /* Adjusted */
+    display: inline-block;
+    margin-right: 0.5rem;
+    font-weight: 600;
+}
+.profile-card .edit-profile-btn {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.6rem 1.2rem;
+    text-decoration: none;
+}
+
+/* No Data Message */
+.no-data-message {
+    text-align: center;
+    padding: 2.5rem; /* More padding */
+    color: var(--secondary-text);
+    font-style: italic;
+    background-color: var(--secondary-bg);
+    border-radius: var(--radius);
+    border: 1px dashed var(--divider-border);
+    margin-top: 1rem;
+    font-size: 0.95rem;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 992px) {
+    /* Tablet */
+    .app-main-content {
+        padding: 1.5rem 2rem;
+    }
+    .pet-list-cards {
+        gap: 1.25rem;
+    }
+}
+
+/* --- Stat Card Grid Styles (for Staff Overview etc.) --- */
+.stats-grid {
+    display: grid;
+    /* Adjust columns for desired layout - 2 or 3 might fit well */
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem; /* Space between cards */
+    margin-top: 1.5rem; /* Space below the intro paragraph */
+    margin-bottom: 1.5rem; /* Space below the grid */
+}
+
+.stat-card {
+    background: var(--surface-bg); /* Matches section background */
+    padding: 1.25rem 1.5rem; /* Padding inside the card */
+    border-radius: var(--radius-lg); /* Use large radius */
+    border: 1px solid var(--divider-border);
+    box-shadow: var(--shadow-sm); /* Use subtle shadow */
+    display: flex; /* Align icon and text content horizontally */
+    align-items: center; /* Center items vertically */
+    gap: 1.25rem; /* Space between icon and text content */
+    border-left: 5px solid transparent; /* Start with transparent left border */
+    transition: all var(--transition-speed) var(--transition-timing);
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+}
+
+/* Specific border colors for different stat types */
+.stat-card.pets {
+    border-left-color: var(--primary-accent);
+} /* Purple for Pets */
+.stat-card.adoptions {
+    border-left-color: var(--tertiary-accent);
+} /* Pinkish for Adoptions */
+.stat-card.sessions {
+    border-left-color: var(--secondary-accent);
+} /* Teal for Sessions */
+.stat-card.trainers {
+    border-left-color: var(--info);
+} /* Cyan for Trainers */
+
+.stat-card .stat-icon {
+    font-size: 2.2rem; /* Size of the icon */
+    line-height: 1; /* Prevent extra spacing */
+    padding: 0.5rem; /* Add some padding around icon if needed */
+    border-radius: 50%; /* Make icon background circular if desired */
+    /* Optional: Add background/color based on card type */
+    color: var(--primary-text); /* Default icon color */
+    opacity: 0.8;
+}
+/* Example: Icon color based on type */
+.stat-card.pets .stat-icon {
+    color: var(--primary-accent);
+}
+.stat-card.adoptions .stat-icon {
+    color: var(--tertiary-accent);
+}
+.stat-card.sessions .stat-icon {
+    color: var(--secondary-accent);
+}
+.stat-card.trainers .stat-icon {
+    color: var(--info);
+}
+
+.stat-card .stat-content {
+    flex-grow: 1; /* Allow text content to take remaining space */
+}
+
+.stat-card .stat-label {
+    font-size: 0.85rem; /* Smaller label text */
+    color: var(--secondary-text); /* Use secondary text color */
+    font-weight: 600;
+    margin-bottom: 0.3rem; /* Space between label and value */
+    display: block;
+    text-transform: uppercase; /* Optional: Uppercase label */
+    letter-spacing: 0.5px; /* Optional: Spacing */
+}
+
+.stat-card .stat-value {
+    font-size: 1.8rem; /* Large value text */
+    font-weight: 700; /* Bold */
+    color: var(--primary-text); /* Use primary text color */
+    line-height: 1.1;
+}
+
+/* Responsive adjustments for stat cards if needed */
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr; /* Stack cards on small screens */
+        gap: 1rem;
+    }
+    .stat-card {
+        padding: 1rem;
+        gap: 1rem;
+    }
+    .stat-card .stat-icon {
+        font-size: 1.8rem;
+    }
+    .stat-card .stat-value {
+        font-size: 1.6rem;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Mobile - Sidebar becomes icon-only */
+    .app-sidebar {
+        width: 65px; /* Icon only width */
+        /* position: absolute; left: 0; top: 0; bottom: 0; z-index: 100; */ /* Keep in flow for simplicity now */
+    }
+
+    .app-sidebar-header .sidebar-title-text,
+    .app-nav li a span,
+    .app-sidebar-footer .user-info,
+    .app-sidebar-footer .logout-text {
+        /* Use visibility and width instead of display:none for smoother transitions if animated later */
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap; /* Added */
+        border: 0;
+        opacity: 0;
+    }
+    .app-sidebar-header {
+        justify-content: center; /* Center icon */
+        padding: 0 0.5rem; /* Reduce padding */
+    }
+    .app-sidebar-header .logo {
+        margin: 0;
+    }
+
+    .app-nav li a {
+        justify-content: center;
+        padding: 0.9rem 0;
+        margin: 0 0.5rem;
+    }
+    .app-nav li a i.fas {
+        margin-right: 0;
+        font-size: 1.2em;
+    }
+    .app-sidebar-footer .logout-link {
+        justify-content: center;
+        padding: 0.75rem 0;
+    }
+    .app-sidebar-footer .logout-link i.fas {
+        margin: 0;
+        font-size: 1.2em;
+    }
+
+    .app-main-content {
+        padding: 1.5rem;
+        /* No padding-left needed if sidebar remains in flow */
+    }
+
+    .content-header h1 {
+        font-size: 1.4rem;
+    }
+    .pet-list-cards {
+        grid-template-columns: 1fr; /* Stack cards */
+    }
+    .content-table {
+        font-size: 0.85rem;
+    }
+    .content-table th,
+    .content-table td {
+        padding: 0.7rem 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Small mobile */
+    .app-main-content {
+        padding: 1rem;
+    }
+    .content-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    .content-header h1 {
+        font-size: 1.25rem;
+    }
+    body {
+        font-size: 15px; /* Slightly smaller base font */
+    }
+    .action-button {
+        /* Make buttons slightly smaller */
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+}

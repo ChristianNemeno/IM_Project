@@ -1,21 +1,42 @@
-/* --- Base Variables (Assuming these exist from your original file) --- */
 :root {
-    /* Add your existing variables here if they are not in a separate file */
-    --primary-bg: #1e1e2f; /* Example dark background */
-    --secondary-bg: #27293d; /* Example slightly lighter dark */
-    --surface-bg: #2c2f48; /* Example card background */
-    --primary-text: #ffffff; /* White text */
+    /* Core Dark Theme Colors - Ensure these match your admin theme */
+    --primary-bg: #1e1e2f; /* Main dark background */
+    --secondary-bg: #27293d; /* Slightly lighter dark (used for content bg) */
+    --surface-bg: #2c2f48; /* Card/Section background */
+    --primary-text: #ffffff; /* Primary light text (or #e1e1e6) */
     --secondary-text: #a9a9b3; /* Lighter gray text */
     --primary-accent: #bb86fc; /* Purple accent */
     --secondary-accent: #03dac6; /* Teal accent */
-    --tertiary-accent: #cf6679; /* Pinkish accent for errors/logout */
-    --divider-border: rgba(255, 255, 255, 0.1); /* Subtle border */
+    --tertiary-accent: #cf6679; /* Pinkish accent */
+    --divider-border: rgba(255, 255, 255, 0.1); /* Subtle light border */
+
+    /* Status Colors (if used by other elements, otherwise not critical for radio buttons) */
+    --success: #4caf50;
+    --warning: #fb8c00;
+    --info: #2196f3;
+
+    /* Gray scale for other elements if needed by .admin-form-container small */
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563; /* Used by 'small' text in your manage_roles.css */
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+
+    /* Radii and Shadows */
     --radius-sm: 4px;
     --radius: 8px;
     --radius-lg: 12px;
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
     --shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
     --shadow-md: 0 6px 10px rgba(0, 0, 0, 0.2);
+
+    /* Typography (optional, but good for consistency) */
+    --font-family-base: "Nunito Sans", sans-serif; /* Example font */
 }
 
 /* --- Core Layout --- */
@@ -23,7 +44,9 @@ body {
     /* Assuming basic body styles are set elsewhere or default */
     margin: 0;
     font-family: sans-serif; /* Add a default font */
-    background-color: var(--secondary-bg); /* Set a background for the whole page */
+    background-color: var(
+        --secondary-bg
+    ); /* Set a background for the whole page */
 }
 
 /* --- FIX: Added .admin-dashboard layout --- */
@@ -31,7 +54,9 @@ body {
 .admin-dashboard {
     display: flex; /* Crucial for positioning sidebar and main content side-by-side */
     min-height: 100vh; /* Ensure it takes full viewport height */
-    background-color: var(--secondary-bg); /* Match body or set a specific background */
+    background-color: var(
+        --secondary-bg
+    ); /* Match body or set a specific background */
 }
 
 /* --- Enhanced Sidebar and Header Styles --- */
@@ -48,7 +73,11 @@ body {
     border-right: 1px solid var(--divider-border);
     transition: width 0.3s ease;
     /* Add subtle gradient background */
-    background-image: linear-gradient(to bottom, rgba(187, 134, 252, 0.05), rgba(3, 218, 198, 0.05));
+    background-image: linear-gradient(
+        to bottom,
+        rgba(187, 134, 252, 0.05),
+        rgba(3, 218, 198, 0.05)
+    );
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
 }
 
@@ -69,14 +98,19 @@ body {
 
 /* Add an accent line under the logo */
 .admin-sidebar h2:after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -10px;
     left: 50%;
     transform: translateX(-50%);
     width: 40%;
     height: 2px;
-    background: linear-gradient(to right, transparent, var(--primary-accent), transparent);
+    background: linear-gradient(
+        to right,
+        transparent,
+        var(--primary-accent),
+        transparent
+    );
 }
 
 /* Navigation Menu */
@@ -108,7 +142,8 @@ body {
 }
 
 /* Navigation Link Icons */
-.admin-nav li a i.fas { /* Target Font Awesome icons */
+.admin-nav li a i.fas {
+    /* Target Font Awesome icons */
     margin-right: 0.8rem; /* Space between icon and text */
     width: 20px; /* Fixed width for alignment */
     text-align: center;
@@ -121,7 +156,6 @@ body {
 .admin-nav li a.active i.fas {
     opacity: 1;
 }
-
 
 /* Add hover effect */
 .admin-nav li a:hover {
@@ -141,13 +175,17 @@ body {
 
 /* Add subtle glow effect to active link */
 .admin-nav li a.active:after {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at center right, rgba(187, 134, 252, 0.2), transparent 70%);
+    background: radial-gradient(
+        circle at center right,
+        rgba(187, 134, 252, 0.2),
+        transparent 70%
+    );
     pointer-events: none;
 }
 
@@ -211,14 +249,16 @@ body {
 
 /* Add subtle pattern to main content */
 .admin-main-content::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-image:
-        radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    background-image: radial-gradient(
+            rgba(255, 255, 255, 0.03) 1px,
+            transparent 1px
+        ),
         radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
     background-size: 20px 20px;
     background-position: 0 0, 10px 10px;
@@ -270,7 +310,10 @@ body {
 /* Enhanced Stats Cards */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Adjusted minmax */
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    ); /* Adjusted minmax */
     gap: 1.5rem;
     margin-bottom: 2.5rem; /* Adjusted margin */
 }
@@ -281,7 +324,8 @@ body {
     border-radius: var(--radius-lg);
     border: 1px solid var(--divider-border);
     box-shadow: var(--shadow);
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out,
+        border-color 0.2s ease-in-out;
     position: relative;
     overflow: hidden;
     display: flex;
@@ -289,7 +333,7 @@ body {
 }
 
 .stat-card::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -302,18 +346,34 @@ body {
 }
 
 /* Different accent colors for different stat cards */
-.stat-card.users::before { background-color: #BB86FC; /* Purple */ }
-.stat-card.personnel::before { background-color: #03DAC6; /* Teal */ }
-.stat-card.adopters::before { background-color: #CF6679; /* Pinkish */ }
-.stat-card.pets-available::before { background-color: #4CAF50; /* Green */ }
-.stat-card.pets-adopted::before { background-color: #FB8C00; /* Orange */ }
-.stat-card.breeds::before { background-color: #2196F3; /* Blue */ }
-.stat-card.species::before { background-color: #F44336; /* Red */ }
+.stat-card.users::before {
+    background-color: #bb86fc; /* Purple */
+}
+.stat-card.personnel::before {
+    background-color: #03dac6; /* Teal */
+}
+.stat-card.adopters::before {
+    background-color: #cf6679; /* Pinkish */
+}
+.stat-card.pets-available::before {
+    background-color: #4caf50; /* Green */
+}
+.stat-card.pets-adopted::before {
+    background-color: #fb8c00; /* Orange */
+}
+.stat-card.breeds::before {
+    background-color: #2196f3; /* Blue */
+}
+.stat-card.species::before {
+    background-color: #f44336; /* Red */
+}
 
 .stat-card:hover {
     transform: translateY(-4px); /* Slightly less lift */
     box-shadow: var(--shadow-md);
-    border-color: var(--primary-accent); /* Use default accent on hover border */
+    border-color: var(
+        --primary-accent
+    ); /* Use default accent on hover border */
 }
 
 .stat-icon {
@@ -370,7 +430,10 @@ body {
 
 .quick-actions-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Adjusted minmax */
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(180px, 1fr)
+    ); /* Adjusted minmax */
     gap: 1rem; /* Adjusted gap */
 }
 
@@ -413,7 +476,6 @@ body {
     font-size: 0.95rem; /* Adjusted size */
     line-height: 1.3; /* Improve readability */
 }
-
 
 /* --- General Admin Styles --- */
 
@@ -587,22 +649,30 @@ h1 {
     border-color: rgba(33, 150, 243, 0.5);
     color: #64b5f6;
 }
-.action-btn.edit:hover { background-color: rgba(33, 150, 243, 0.4); color: #bbdefb; }
+.action-btn.edit:hover {
+    background-color: rgba(33, 150, 243, 0.4);
+    color: #bbdefb;
+}
 
 .action-btn.delete {
     background-color: rgba(244, 67, 54, 0.2); /* Red */
     border-color: rgba(244, 67, 54, 0.5);
     color: #ef9a9a;
 }
-.action-btn.delete:hover { background-color: rgba(244, 67, 54, 0.4); color: #ffcdd2; }
+.action-btn.delete:hover {
+    background-color: rgba(244, 67, 54, 0.4);
+    color: #ffcdd2;
+}
 
 .action-btn.view {
     background-color: rgba(76, 175, 80, 0.2); /* Green */
     border-color: rgba(76, 175, 80, 0.5);
     color: #a5d6a7;
 }
-.action-btn.view:hover { background-color: rgba(76, 175, 80, 0.4); color: #c8e6c9; }
-
+.action-btn.view:hover {
+    background-color: rgba(76, 175, 80, 0.4);
+    color: #c8e6c9;
+}
 
 /* Status Badges (e.g., health, adoption) */
 .health-status, .adoption-status /* Add more specific classes if needed */ {
@@ -614,11 +684,25 @@ h1 {
     text-transform: capitalize;
 }
 /* Example status colors */
-.health-status.excellent, .adoption-status.available { background-color: rgba(76, 175, 80, 0.2); color: #a5d6a7; } /* Green */
-.health-status.good, .adoption-status.pending { background-color: rgba(33, 150, 243, 0.2); color: #90caf9; } /* Blue */
-.health-status.fair { background-color: rgba(255, 152, 0, 0.2); color: #ffcc80; } /* Orange */
-.health-status.poor, .adoption-status.adopted { background-color: rgba(117, 117, 117, 0.2); color: #e0e0e0; } /* Gray */
-
+.health-status.excellent,
+.adoption-status.available {
+    background-color: rgba(76, 175, 80, 0.2);
+    color: #a5d6a7;
+} /* Green */
+.health-status.good,
+.adoption-status.pending {
+    background-color: rgba(33, 150, 243, 0.2);
+    color: #90caf9;
+} /* Blue */
+.health-status.fair {
+    background-color: rgba(255, 152, 0, 0.2);
+    color: #ffcc80;
+} /* Orange */
+.health-status.poor,
+.adoption-status.adopted {
+    background-color: rgba(117, 117, 117, 0.2);
+    color: #e0e0e0;
+} /* Gray */
 
 /* Messages (Success/Error) */
 .message {
@@ -653,16 +737,18 @@ h1 {
         padding: 0 0.5rem;
         justify-content: center;
     }
-     .admin-sidebar h2 i.fas { /* Ensure icon is visible */
+    .admin-sidebar h2 i.fas {
+        /* Ensure icon is visible */
         margin-right: 0;
     }
-     .admin-sidebar h2 span { /* Hide text part of title */
-       /* display: none; */ /* Keep title for accessibility if needed */
-       font-size: 0; /* Hide visually */
-       width: 0;
-       opacity: 0;
+    .admin-sidebar h2 span {
+        /* Hide text part of title */
+        /* display: none; */ /* Keep title for accessibility if needed */
+        font-size: 0; /* Hide visually */
+        width: 0;
+        opacity: 0;
     }
-     .admin-sidebar h2:after {
+    .admin-sidebar h2:after {
         display: none; /* Hide accent line */
     }
 
@@ -680,7 +766,6 @@ h1 {
         font-size: 1.3em; /* Make icons slightly larger */
     }
 
-
     .admin-footer {
         padding: 1rem 0.5rem;
     }
@@ -688,10 +773,12 @@ h1 {
     .admin-footer span.role-badge {
         display: none;
     }
-    .admin-footer a span { /* Hide logout text */
+    .admin-footer a span {
+        /* Hide logout text */
         display: none;
     }
-     .admin-footer a i.fas { /* Center logout icon */
+    .admin-footer a i.fas {
+        /* Center logout icon */
         margin: 0 auto;
     }
 
@@ -717,7 +804,10 @@ h1 {
     }
 
     .quick-actions-grid {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); /* Adjust for smaller cards */
+        grid-template-columns: repeat(
+            auto-fill,
+            minmax(130px, 1fr)
+        ); /* Adjust for smaller cards */
     }
 
     .stat-card {
@@ -741,13 +831,14 @@ h1 {
         padding: 1rem;
     }
 
-     h1 {
+    h1 {
         font-size: 1.5rem;
     }
     .admin-form-container {
         padding: 1.5rem;
     }
-    .admin-table th, .admin-table td {
+    .admin-table th,
+    .admin-table td {
         padding: 0.7rem 0.8rem;
         font-size: 0.85rem;
     }
@@ -770,17 +861,29 @@ h1 {
         font-size: 0.85rem;
     }
 
-     .admin-main-content {
+    .admin-main-content {
         padding: 1rem;
     }
-     h1 {
+    h1 {
         font-size: 1.3rem;
     }
-     .admin-button {
+    .admin-button {
         padding: 0.6rem 1rem;
         font-size: 0.85rem;
     }
     .admin-form-container {
         padding: 1rem;
     }
+}
+
+/* In admin_manage_roles.css or admin_styles.css */
+.radio-group input[type="radio"] {
+    margin-right: 0.3rem;
+    vertical-align: middle;
+}
+.radio-label {
+    margin-right: 1.5rem;
+    font-weight: normal !important; /* If overriding general label styles */
+    vertical-align: middle;
+    cursor: pointer;
 }

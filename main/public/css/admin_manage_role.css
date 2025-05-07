@@ -1,0 +1,104 @@
+/* main/public/css/admin_manage_roles.css */
+
+/* Styles specific to admin/manage_roles.php */
+
+/* Existing checkbox styles (if still used elsewhere or for reference) */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+.checkbox-group input[type="checkbox"] {
+    margin-right: 0.5rem;
+    width: auto; /* Override general input width */
+    height: 1.2em;
+    /* width: 1.2em; */ /* Redundant if height is set and aspect ratio is 1 */
+    cursor: pointer;
+}
+.checkbox-label {
+    margin-bottom: 0 !important; /* Override general label margin */
+    font-weight: normal !important; /* Override general label weight */
+    cursor: pointer;
+}
+
+/* Styles for the small helper text */
+.admin-form-container .form-group small {
+    display: block;
+    margin-top: 0.75rem; /* Increased spacing */
+    font-size: 0.8rem;
+    color: var(--secondary-text); /* Use theme variable from admin_styles.css */
+}
+
+/* Styles for role management radio buttons */
+.admin-form-container .form-group .radio-group {
+    display: flex;
+    flex-direction: column; /* Stack options vertically */
+    gap: 0.85rem; /* Space between each role option */
+    margin-top: 0.75rem; /* Space above the group */
+}
+
+.admin-form-container .form-group .radio-option {
+    display: flex;
+    align-items: center; /* Align radio button and label vertically */
+    cursor: pointer; /* Make the whole area clickable to toggle radio */
+}
+
+.admin-form-container .form-group input[type="radio"] {
+    /* Reset default appearance */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    /* Custom dimensions */
+    width: 18px;
+    height: 18px;
+
+    /* Border and shape */
+    border: 2px solid var(--divider-border); /* Use theme's border color */
+    border-radius: 50%; /* Circular */
+
+    /* Interaction and positioning */
+    outline: none;
+    cursor: pointer;
+    margin-right: 0.7rem; /* Space between radio and label */
+    position: relative; /* For the inner dot pseudo-element */
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    flex-shrink: 0; /* Prevent radio from shrinking if label is long */
+}
+
+.admin-form-container .form-group input[type="radio"]:hover {
+    border-color: var(--primary-accent); /* Highlight border on hover */
+}
+
+.admin-form-container .form-group input[type="radio"]:checked {
+    border-color: var(
+        --primary-accent
+    ); /* Use accent color for border when checked */
+    background-color: var(
+        --primary-accent
+    ); /* Fill with accent color when checked */
+}
+
+/* Inner dot for the checked state */
+.admin-form-container .form-group input[type="radio"]:checked::before {
+    content: "";
+    display: block;
+    width: 8px; /* Size of inner dot */
+    height: 8px;
+    background-color: var(
+        --primary-bg
+    ); /* Use main background for dot for contrast */
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.admin-form-container .form-group .radio-label {
+    font-weight: normal;
+    color: var(--secondary-text); /* Use theme's text color */
+    font-size: 0.95rem;
+    line-height: 1.2; /* Ensure it aligns well with radio */
+    user-select: none; /* Prevent text selection when clicking label */
+}

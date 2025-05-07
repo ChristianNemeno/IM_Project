@@ -1,549 +1,501 @@
-/* Reset and base styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+/* main/public/css/app_styles.css */
+/* User Dashboard Styles - Dark Theme based on Admin */
 
+/* --- Dark Theme Variables (from admin_styles.css) --- */
 :root {
-    --primary: #4f46e5;
-    --primary-light: #6366f1;
-    --primary-dark: #4338ca;
-    --success: #059669;
-    --success-light: #dcfce7;
-    --warning: #d97706;
-    --warning-light: #fef3c7;
-    --info: #2563eb;
-    --info-light: #dbeafe;
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-300: #d1d5db;
-    --gray-400: #9ca3af;
-    --gray-500: #6b7280;
-    --gray-600: #4b5563;
-    --gray-700: #374151;
-    --gray-800: #1f2937;
-    --gray-900: #111827;
+    /* Core Dark Theme Colors */
+    --primary-bg: #1e1e2f; /* Main dark background */
+    --secondary-bg: #27293d; /* Slightly lighter dark (used for content bg) */
+    --surface-bg: #2c2f48; /* Card/Section background */
+    --primary-text: #e1e1e6; /* Primary light text (slightly off-white) */
+    --secondary-text: #a9a9b3; /* Lighter gray text */
+    --primary-accent: #bb86fc; /* Purple accent */
+    --secondary-accent: #03dac6; /* Teal accent */
+    --tertiary-accent: #cf6679; /* Pinkish accent for alerts/logout */
+    --divider-border: rgba(255, 255, 255, 0.1); /* Subtle light border */
+
+    /* Status Colors (adjust for dark theme contrast if needed) */
+    --success: #4caf50;
+    --success-light: rgba(76, 175, 80, 0.15); /* Example: transparent green */
+    --warning: #fb8c00;
+    --warning-light: rgba(251, 140, 0, 0.15);
+    --info: #2196f3;
+    --info-light: rgba(33, 150, 243, 0.15);
+    --adopted-color: var(--secondary-text); /* Color for adopted status text */
+    --adopted-bg: rgba(169, 169, 177, 0.15); /* Background for adopted status */
+
+    /* Radii and Shadows */
+    --radius-sm: 4px;
+    --radius: 8px;
+    --radius-lg: 12px;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    --shadow-md: 0 6px 10px rgba(0, 0, 0, 0.2);
 }
 
+/* --- Core Layout --- */
 body {
+    margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
         Ubuntu, Cantarell, sans-serif;
-    background-color: var(--gray-100);
-    color: var(--gray-900);
+    background-color: var(
+        --secondary-bg
+    ); /* Use secondary dark for overall page bg */
+    color: var(--primary-text); /* Default text color */
     line-height: 1.5;
 }
 
-/* Dashboard Layout */
-.dashboard {
-    min-height: 100vh;
-}
-
-/* Navigation */
-.nav {
-    background-color: white;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-        0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-.nav-container {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
-    height: 4.5rem;
+.app-dashboard {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    min-height: 100vh;
+    background-color: var(--secondary-bg);
 }
 
-.nav-logo {
+/* --- Sidebar --- */
+.app-sidebar {
+    width: 260px;
+    background-color: var(--primary-bg); /* Darker sidebar */
+    color: var(--secondary-text); /* Use secondary text for sidebar */
+    padding: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    border-right: 1px solid var(--divider-border);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow */
+    transition: width 0.3s ease;
+}
+
+.app-sidebar-header {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-accent); /* Purple accent for title */
+    margin-bottom: 2rem;
+    padding: 0 1.5rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
 }
-
-.logo {
-    height: 2.5rem;
-    width: 2.5rem;
-    border-radius: 9999px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+.app-sidebar-header .logo {
+    color: var(--primary-accent); /* Ensure icon uses accent color */
+    font-size: 1.8rem; /* Adjust if needed */
 }
 
-.logo-text {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary);
-    letter-spacing: -0.025em;
+.app-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.nav-actions {
+.app-nav li a {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
-}
-
-.search-container {
-    position: relative;
-}
-
-.search-input {
-    width: 18rem;
-    padding: 0.625rem 1.25rem;
-    border-radius: 0.75rem;
-    border: 2px solid var(--gray-200);
-    outline: none;
+    padding: 0.9rem 1.5rem;
+    color: var(--secondary-text); /* Sidebar link text */
+    text-decoration: none;
     transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+    font-weight: 500;
     font-size: 0.95rem;
+    margin: 0.3rem 0.75rem;
+    border-radius: var(--radius);
 }
 
-.search-input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+.app-nav li a i.fas {
+    margin-right: 0.8rem;
+    width: 20px;
+    text-align: center;
+    font-size: 1.1em;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
 }
 
-.profile-pic {
-    width: 2.75rem;
-    height: 2.75rem;
-    background-color: var(--gray-200);
-    border-radius: 9999px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+/* Hover state - mimic admin */
+.app-nav li a:hover {
+    background-color: rgba(187, 134, 252, 0.1); /* Light purple bg */
+    color: var(--primary-text); /* Brighter text on hover */
+    border-left-color: rgba(187, 134, 252, 0.5); /* Purple accent line */
+    transform: translateX(2px); /* Slight shift */
+}
+.app-nav li a:hover i.fas {
+    opacity: 1;
 }
 
-/* Main Content */
-.main-content {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 2.5rem 1.5rem;
+/* Active state - mimic admin */
+.app-nav li a.active {
+    background-color: rgba(187, 134, 252, 0.15); /* Slightly darker purple bg */
+    color: var(--primary-accent); /* Purple text for active */
+    border-left-color: var(--primary-accent);
+    font-weight: 600;
+}
+.app-nav li a.active i.fas {
+    opacity: 1;
+    color: var(--primary-accent); /* Purple icon for active */
 }
 
-/* Stats Grid */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2.5rem;
+.app-sidebar-footer {
+    margin-top: auto;
+    padding: 1.2rem 1.5rem;
+    font-size: 0.9rem;
+    border-top: 1px solid var(--divider-border);
+    background-color: rgba(0, 0, 0, 0.1); /* Slightly darker footer area */
+}
+.app-sidebar-footer .user-info {
+    margin-bottom: 0.75rem;
+}
+.app-sidebar-footer .user-name {
+    font-weight: 600;
+    display: block;
+    color: var(--primary-text); /* Brighter name */
+}
+.app-sidebar-footer .user-role {
+    font-size: 0.8rem;
+    color: var(--secondary-text);
+    text-transform: capitalize;
+}
+.app-sidebar-footer .logout-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    color: var(--tertiary-accent); /* Use pinkish for logout */
+    text-decoration: none;
+    border-radius: var(--radius);
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+.app-sidebar-footer .logout-link:hover {
+    color: #ff8a9d; /* Lighter pink on hover */
+    text-decoration: underline;
 }
 
-.stat-card {
-    background: linear-gradient(145deg, white, #f8fafc);
-    padding: 1.75rem;
-    border-radius: 1rem;
-    border-left: 4px solid var(--primary);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-        0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+/* --- Main Content --- */
+.app-main-content {
+    flex-grow: 1;
+    padding: 2rem 2.5rem;
+    overflow-y: auto;
+    background-color: var(--secondary-bg); /* Match body background */
+    position: relative; /* For potential future pseudo-elements like patterns */
 }
 
-.stat-card::before {
+/* Optional: Add subtle pattern like admin */
+.app-main-content::before {
     content: "";
     position: absolute;
     top: 0;
+    left: 0;
     right: 0;
-    height: 6px;
-    width: 100%;
-    background: linear-gradient(90deg, var(--primary), var(--primary-light));
-    border-radius: 4px;
+    bottom: 0;
+    background-image: radial-gradient(
+            rgba(255, 255, 255, 0.02) 1px,
+            transparent 1px
+        ),
+        radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 25px 25px;
+    background-position: 0 0, 12px 12px;
+    pointer-events: none;
+    z-index: 0;
 }
-
-.stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-        0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-top: 0.75rem;
-    background: linear-gradient(90deg, var(--primary), var(--primary-light));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
-}
-
-.stat-label {
-    color: var(--gray-600);
-    font-size: 0.95rem;
-    font-weight: 500;
-}
-
-.stat-change {
-    font-size: 0.95rem;
-    margin-top: 0.75rem;
-    font-weight: 500;
-}
-
-.stat-change.positive {
-    color: var(--success);
-}
-
-.stat-change.neutral {
-    color: var(--gray-500);
-}
-
-/* Table Section */
-.table-section {
-    background-color: white;
-    padding: 1.75rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-        0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    margin-bottom: 2.5rem;
-}
-
-.table-container {
-    overflow-x: auto;
-    border-radius: 0.75rem;
-}
-
-.pet-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    text-align: left;
-}
-
-.pet-table th {
-    background-color: var(--gray-50);
-    padding: 1rem 1.5rem;
-    font-weight: 600;
-    color: var(--gray-700);
-    border-bottom: 2px solid var(--gray-200);
-    white-space: nowrap;
-}
-
-.pet-table td {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--gray-200);
-}
-
-.pet-table tbody tr {
-    transition: all 0.2s ease;
-}
-
-.pet-table tbody tr:hover {
-    background-color: var(--gray-50);
-}
-
-.health-status {
-    padding: 0.375rem 1rem;
-    border-radius: 9999px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    display: inline-block;
-}
-
-.health-status.excellent {
-    background-color: var(--success-light);
-    color: var(--success);
-}
-
-.health-status.good {
-    background-color: var(--info-light);
-    color: var(--info);
-}
-
-.health-status.fair {
-    background-color: var(--warning-light);
-    color: var(--warning);
-}
-
-/* Graph Section */
-.graph-section {
-    background-color: white;
-    padding: 1.75rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-        0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    margin-bottom: 2.5rem;
-}
-
-.graph-container {
-    padding: 2rem 1.5rem;
-}
-
-.graph-bar-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1.75rem;
-}
-
-.graph-label {
-    width: 120px;
-    font-weight: 500;
-    color: var(--gray-700);
-}
-
-.graph-bar {
-    flex-grow: 1;
-    height: 2.5rem;
-    background: linear-gradient(to right, var(--primary), var(--primary-light));
-    border-radius: 0.5rem;
+/* Ensure content is above the pattern */
+.app-main-content > * {
     position: relative;
-    width: var(--percentage);
-    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    z-index: 1;
 }
 
-.graph-value {
-    position: absolute;
-    right: 1rem;
-    color: white;
-    font-weight: 600;
-    line-height: 2.5rem;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-/* Content Grid */
-.content-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 2rem;
-}
-
-@media (max-width: 1024px) {
-    .content-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Pets Section */
-.pets-section,
-.schedule-section {
-    background-color: white;
-    padding: 1.75rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-        0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--gray-800);
-    margin-bottom: 1.5rem;
-}
-
-.pet-cards {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.pet-card {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    padding: 1.5rem;
-    background: linear-gradient(145deg, white, #f8fafc);
-    border-radius: 1rem;
-    transition: all 0.3s ease;
-    border-left: 4px solid var(--primary-light);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-        0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-.pet-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-        0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-.pet-image {
-    width: 5rem;
-    height: 5rem;
-    border-radius: 1rem;
-    object-fit: cover;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    border: 3px solid white;
-}
-
-.view-button {
-    padding: 0.75rem 1.5rem;
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    color: white;
-    border: none;
-    border-radius: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(99, 102, 241, 0.5);
-}
-
-.pet-info {
-    flex: 1;
-}
-
-.pet-info h3 {
-    font-weight: 600;
-    color: var(--gray-800);
-    margin-bottom: 0.25rem;
-}
-
-.pet-info p {
-    color: var(--gray-500);
-    font-size: 0.95rem;
-}
-
-.view-button:hover {
-    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-    transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(99, 102, 241, 0.6);
-}
-
-/* Schedule Section */
-.schedule-cards {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.schedule-card {
-    padding: 1.5rem;
-    background: linear-gradient(145deg, white, #f8fafc);
-    border-radius: 1rem;
-    transition: all 0.3s ease;
-    border-left: 4px solid var(--info);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-        0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-.schedule-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-        0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-.schedule-header {
+.content-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--divider-border);
+}
+.content-header h1 {
+    color: var(--primary-text); /* Light text for heading */
+    margin: 0;
+    font-size: 1.75rem;
 }
 
-.training-type {
-    color: var(--info);
-    font-weight: 700;
-    font-size: 1.1rem;
+/* --- Sections & Cards --- */
+.dashboard-section {
+    /* Style sections containing content */
+    background-color: var(
+        --surface-bg
+    ); /* Use surface color for cards/sections */
+    padding: 1.75rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    margin-bottom: 2.5rem;
+    border: 1px solid var(--divider-border);
 }
-
-.training-time {
-    background-color: var(--info-light);
-    color: var(--info);
-    font-size: 0.9rem;
+.dashboard-section h2 {
+    font-size: 1.25rem;
     font-weight: 600;
-    padding: 0.35rem 0.75rem;
-    border-radius: 9999px;
+    color: var(--primary-text); /* Light text for section headings */
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--divider-border);
 }
 
-.training-pet {
-    color: var(--gray-700);
-    font-size: 1rem;
-    margin-top: 0.75rem;
+/* Pet Cards */
+.pet-list-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+.pet-list-card {
+    background: var(--surface-bg); /* Surface color */
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    border-left: 4px solid var(--primary-accent); /* Purple accent */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    color: var(--secondary-text); /* Default text in card */
+}
+.pet-list-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-left-color: var(--secondary-accent); /* Teal accent on hover */
+}
+.pet-list-card img.pet-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    margin-bottom: 1rem;
+    border: 1px solid var(--divider-border);
+}
+.pet-list-card h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--primary-text); /* Brighter text for pet name */
+    margin-bottom: 0.25rem;
+}
+.pet-list-card p {
+    font-size: 0.9rem;
+    color: var(--secondary-text);
+    margin-bottom: 0.5rem;
+}
+.pet-list-card .pet-info-main {
+    flex-grow: 1;
+}
+
+/* Buttons within Cards/Sections */
+.action-button {
+    display: inline-block;
+    padding: 0.7rem 1.3rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
     font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    background-color: var(--primary-accent); /* Purple button */
+    color: var(--primary-bg); /* Dark text on purple button */
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+}
+.action-button:hover {
+    opacity: 0.9;
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+}
+.action-button.secondary {
+    background-color: var(--surface-bg); /* Surface bg for secondary */
+    color: var(--primary-text); /* Light text */
+    border-color: var(--divider-border);
+}
+.action-button.secondary:hover {
+    background-color: var(--secondary-bg); /* Darker bg on hover */
+    border-color: var(--secondary-text);
+}
+.action-button.success {
+    background-color: var(--success);
+    color: #fff;
+}
+.action-button.success:hover {
+    opacity: 0.9;
+}
+.pet-list-card .action-button {
+    margin-top: 1rem;
 }
 
-/* Custom colors for different stat cards */
-.stat-card:nth-child(1) {
-    border-left-color: var(--primary);
+/* Table Styles */
+.content-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background-color: var(--surface-bg); /* Matches section bg */
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--divider-border); /* Add subtle border to table itself */
 }
-.stat-card:nth-child(1)::before {
-    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+.content-table th,
+.content-table td {
+    padding: 0.9rem 1.1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--divider-border);
+    font-size: 0.9rem;
+    vertical-align: middle;
+    color: var(--secondary-text); /* Default cell text */
 }
-.stat-card:nth-child(1) .stat-value {
-    background: linear-gradient(90deg, var(--primary), var(--primary-light));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
+.content-table th {
+    background-color: rgba(0, 0, 0, 0.15); /* Slightly darker header */
+    color: var(--primary-text); /* Brighter header text */
+    font-weight: 600;
+    white-space: nowrap;
 }
-
-.stat-card:nth-child(2) {
-    border-left-color: var(--success);
+.content-table tbody tr {
+    transition: background-color 0.15s ease;
 }
-.stat-card:nth-child(2)::before {
-    background: linear-gradient(90deg, var(--success), #34d399);
+.content-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.04); /* Subtle light hover */
 }
-.stat-card:nth-child(2) .stat-value {
-    background: linear-gradient(90deg, var(--success), #34d399);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
+.content-table td .action-button {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+    margin-right: 0.5rem;
 }
-
-.stat-card:nth-child(3) {
-    border-left-color: var(--info);
-}
-.stat-card:nth-child(3)::before {
-    background: linear-gradient(90deg, var(--info), #60a5fa);
-}
-.stat-card:nth-child(3) .stat-value {
-    background: linear-gradient(90deg, var(--info), #60a5fa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
+.content-table td .action-button:last-child {
+    margin-right: 0;
 }
 
-.stat-card:nth-child(4) {
-    border-left-color: var(--warning);
+/* Status Badges (Health, Adoption etc.) */
+.health-status {
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-block;
+    text-transform: capitalize;
+    border: 1px solid transparent; /* Base border */
 }
-.stat-card:nth-child(4)::before {
-    background: linear-gradient(90deg, var(--warning), #fbbf24);
-}
-.stat-card:nth-child(4) .stat-value {
-    background: linear-gradient(90deg, var(--warning), #fbbf24);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
-}
-
-/* Color variations for pet cards */
-.pet-card:nth-child(1) {
-    border-left-color: var(--primary);
-}
-.pet-card:nth-child(2) {
-    border-left-color: var(--success);
-}
-.pet-card:nth-child(3) {
-    border-left-color: var(--info);
-}
-
-/* Color variations for schedule cards */
-.schedule-card:nth-child(1) {
-    border-left-color: var(--primary);
-}
-.schedule-card:nth-child(1) .training-type {
-    color: var(--primary);
-}
-.schedule-card:nth-child(1) .training-time {
-    background-color: rgba(99, 102, 241, 0.1);
-    color: var(--primary);
-}
-
-.schedule-card:nth-child(2) {
-    border-left-color: var(--success);
-}
-.schedule-card:nth-child(2) .training-type {
-    color: var(--success);
-}
-.schedule-card:nth-child(2) .training-time {
+/* Example status colors (adjust as needed for contrast) */
+.health-status.excellent,
+.health-status.available {
     background-color: var(--success-light);
-    color: var(--success);
+    color: #a5d6a7;
+    border-color: var(--success);
+} /* Green */
+.health-status.good {
+    background-color: var(--info-light);
+    color: #90caf9;
+    border-color: var(--info);
+} /* Blue */
+.health-status.fair {
+    background-color: var(--warning-light);
+    color: #ffcc80;
+    border-color: var(--warning);
+} /* Orange */
+.health-status.poor {
+    background-color: rgba(117, 117, 117, 0.2);
+    color: #e0e0e0;
+    border-color: #757575;
+} /* Gray */
+.health-status.adopted,
+.health-status.pending {
+    background-color: var(--adopted-bg);
+    color: var(--adopted-color);
+    border-color: var(--adopted-color);
+} /* Specific adopted/pending */
+
+/* Profile Page Specific */
+.profile-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+.profile-card {
+    background-color: var(--surface-bg);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--divider-border);
+}
+.profile-card h2 {
+    font-size: 1.2rem;
+    color: var(--primary-accent); /* Purple headings */
+    margin-top: 0;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--divider-border);
+}
+.profile-card p {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+    color: var(--secondary-text);
+}
+.profile-card p strong {
+    color: var(--primary-text); /* Brighter label */
+    min-width: 100px;
+    display: inline-block;
+}
+.profile-card .edit-profile-btn {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.6rem 1.2rem;
+    text-decoration: none;
 }
 
-.schedule-card:nth-child(3) {
-    border-left-color: var(--warning);
+/* No Data Message */
+.no-data-message {
+    text-align: center;
+    padding: 2rem;
+    color: var(--secondary-text); /* Use secondary text color */
+    font-style: italic;
+    background-color: var(--secondary-bg); /* Match content background */
+    border-radius: var(--radius);
+    border: 1px dashed var(--divider-border); /* Dashed border */
+    margin-top: 1rem; /* Add some space */
 }
-.schedule-card:nth-child(3) .training-type {
-    color: var(--warning);
+
+/* Responsive Adjustments (Keep similar to before) */
+@media (max-width: 768px) {
+    .app-sidebar {
+        width: 70px;
+        overflow: hidden;
+    }
+    .app-sidebar-header span,
+    .app-nav li a span,
+    .app-sidebar-footer .user-info,
+    .app-sidebar-footer .logout-link span {
+        display: none;
+    }
+    .app-sidebar-header .logo {
+        margin: 0 auto; /* Center logo */
+    }
+    .app-nav li a {
+        justify-content: center;
+        padding: 0.9rem 0;
+    }
+    .app-nav li a i.fas {
+        margin-right: 0;
+        font-size: 1.3em;
+    }
+    .app-sidebar-footer .logout-link i.fas {
+        margin: 0 auto;
+    }
+    .app-main-content {
+        padding: 1.5rem;
+    }
+    .content-header h1 {
+        font-size: 1.5rem;
+    }
 }
-.schedule-card:nth-child(3) .training-time {
-    background-color: var(--warning-light);
-    color: var(--warning);
+@media (max-width: 480px) {
+    .app-main-content {
+        padding: 1rem;
+    }
+    .content-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    .pet-list-cards {
+        grid-template-columns: 1fr; /* Single column on very small screens */
+    }
 }

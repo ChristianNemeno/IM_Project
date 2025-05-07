@@ -1,28 +1,28 @@
 <?php
 // Include the logic file
-require_once('dashboard-logic.php');
+require_once('dashboard-logic.php'); // This already starts the session
 
 if (!isset($_SESSION['user_id'])) {
     // If not logged in, redirect to login page
     header("Location: login.php");
     exit(); // Stop further script execution
 }
-// Get all data for the dashboard
-$dashboardData = getAllDashboardData();
 
-// Extract data into variables for easier access in HTML
-$stats = $dashboardData['stats'];
-$petRegistry = $dashboardData['petRegistry'];
-$speciesDistribution = $dashboardData['speciesDistribution'];
-$recentPets = $dashboardData['recentPets'];
-$upcomingTraining = $dashboardData['upcomingTraining'];
+// Get user type and role from session
+$user_type = $_SESSION['user_type'] ?? null;
+$personnel_role = $_SESSION['personnel_role'] ?? null;
+$user_name = $_SESSION['user_name'] ?? 'Guest';
 
-// Image placeholders for pets
-$placeholderImages = [
+// Default placeholder for pet images, used if pet_image is null or empty
+$defaultPetImage = 'public/images/placeholder-pet.png'; // Make sure this placeholder image exists
+
+// Image placeholders for pets if specific images aren't available (can be removed if all pets have images)
+$placeholderGalleryImages = [
     "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=100&h=100&fit=crop",
     "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=100&h=100&fit=crop",
     "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=100&h=100&fit=crop"
 ];
+
 ?>
 
 <!DOCTYPE html>
@@ -30,7 +30,7 @@ $placeholderImages = [
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Pet Adoption & Training Dashboard</title>
+        <title>Escova INC. Dashboard</title>
         <link rel="stylesheet" href="public/css/styles.css" />
          <style>
             /* Add a simple style for the logout button */
@@ -46,6 +46,95 @@ $placeholderImages = [
             .logout-button:hover {
                 background-color: var(--primary-dark); /* Darker shade on hover */
             }
+            .profile-actions { /* Container for profile link and logout */
+                display: flex;
+                align-items: center;
+            }
+            .profile-link {
+                color: var(--primary);
+                text-decoration: none;
+                font-weight: 500;
+                margin-right: 1rem;
+            }
+            .profile-link:hover {
+                text-decoration: underline;
+            }
+            .dashboard-section {
+                background-color: white;
+                padding: 1.75rem;
+                border-radius: 1rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                margin-bottom: 2.5rem;
+            }
+            .dashboard-section h2 {
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: var(--gray-800);
+                margin-bottom: 1.5rem;
+                padding-bottom: 0.75rem;
+                border-bottom: 1px solid var(--gray-200);
+            }
+            .profile-details p { margin-bottom: 0.5em; }
+            .profile-details strong { color: var(--primary-dark); }
+
+            /* Basic card styling for pet lists */
+            .pet-list-cards {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 1.5rem;
+            }
+            .pet-list-card {
+                background: linear-gradient(145deg, white, #f8fafc);
+                border-radius: 1rem;
+                padding: 1.5rem;
+                box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+                display: flex;
+                flex-direction: column;
+                border-left: 4px solid var(--primary-light);
+            }
+            .pet-list-card img {
+                width: 100%;
+                height: 180px;
+                object-fit: cover;
+                border-radius: 0.5rem;
+                margin-bottom: 1rem;
+            }
+            .pet-list-card h3 {
+                font-size: 1.15rem;
+                font-weight: 600;
+                color: var(--gray-800);
+                margin-bottom: 0.25rem;
+            }
+            .pet-list-card p {
+                font-size: 0.9rem;
+                color: var(--gray-600);
+                margin-bottom: 0.75rem;
+                flex-grow: 1;
+            }
+            .pet-list-card .action-button {
+                padding: 0.6rem 1.2rem;
+                background: linear-gradient(135deg, var(--primary), var(--primary-light));
+                color: white;
+                border: none;
+                border-radius: 0.5rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block; /* Or block if you want it full width */
+            }
+            .pet-list-card .action-button:hover {
+                background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+                transform: translateY(-2px);
+            }
+
+            /* Training Schedule Table */
+            .training-schedule-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 1rem; }
+            .training-schedule-table th, .training-schedule-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-200); text-align: left;}
+            .training-schedule-table th { background-color: var(--gray-50); font-weight: 600; color: var(--gray-700); }
+            .training-schedule-table tbody tr:hover { background-color: var(--gray-50); }
+
         </style>
     </head>
     <body>
@@ -54,163 +143,62 @@ $placeholderImages = [
                 <div class="nav-container">
                     <div class="nav-logo">
                         <img
-                            src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=50&h=50&fit=crop"
-                            alt="Logo"
+                            src="public/images/logo-placeholder.png" alt="Logo"
                             class="logo"
-                        />
+                            style="background-color: var(--primary-light);" />
                         <span class="logo-text">Escova INC.</span>
                     </div>
                     <div class="nav-actions">
-                        <div class="search-container">
-                            <input
-                                type="text"
-                                placeholder="Search pets..."
-                                class="search-input"
-                            />
+                        <div class="profile-actions">
+                             <a href="dashboard.php?view=profile" class="profile-link">Welcome, <?php echo htmlspecialchars($user_name); ?>!</a>
+                            <div class="profile-pic"> </div>
+                            <a href="logout.php" class="logout-button">Logout</a>
                         </div>
-                        <div class="profile-pic">
-                            </div>
-                        <a href="logout.php" class="logout-button">Logout</a>
-                         </div>
+                    </div>
                 </div>
             </nav>
 
             <main class="main-content">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">Total Pets</div>
-                        <div class="stat-value"><?php echo $stats['totalPets']; ?></div>
-                        <div class="stat-change positive">↑ Updated from DB</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Adoptions</div>
-                        <div class="stat-value"><?php echo $stats['totalAdoptions']; ?></div>
-                        <div class="stat-change positive">↑ Updated from DB</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Training Sessions</div>
-                        <div class="stat-value"><?php echo $stats['totalSessions']; ?></div>
-                        <div class="stat-change positive">↑ Updated from DB</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Active Trainers</div>
-                        <div class="stat-value"><?php echo $stats['totalTrainers']; ?></div>
-                        <div class="stat-change neutral">Updated from DB</div>
-                    </div>
-                </div>
+                <?php
+                // Determine which content to load based on user type and role
+                // And also check for a 'view' GET parameter for profile page
+                $current_view = $_GET['view'] ?? 'default';
 
-                <div class="table-section">
-                    <h2>Pet Registry</h2>
-                    <div class="table-container">
-                        <table class="pet-table">
-                            <thead>
-                                <tr>
-                                    <th>Pet ID</th>
-                                    <th>Name</th>
-                                    <th>Species</th>
-                                    <th>Breed</th>
-                                    <th>Age</th>
-                                    <th>Health Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($petRegistry as $pet): ?>
-                                <tr>
-                                    <td>P<?php echo str_pad($pet['pet_id'], 3, '0', STR_PAD_LEFT); ?></td>
-                                    <td><?php echo htmlspecialchars($pet['name']); ?></td>
-                                    <td><?php echo htmlspecialchars($pet['species_name']); ?></td>
-                                    <td><?php echo htmlspecialchars($pet['breed_name']); ?></td>
-                                    <td><?php echo $pet['age'] . ' ' . ($pet['age'] == 1 ? 'year' : 'years'); ?></td>
-                                    <td>
-                                        <span class="health-status <?php echo strtolower($pet['health_status']); ?>">
-                                            <?php echo htmlspecialchars($pet['health_status']); ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="graph-section">
-                    <h2>Pet Distribution by Species</h2>
-                    <div class="graph-container">
-                        <?php foreach ($speciesDistribution as $species => $data): ?>
-                        <div class="graph-bar-container">
-                            <div class="graph-label"><?php echo htmlspecialchars($species); ?></div>
-                            <div class="graph-bar" style="--percentage: <?php echo $data['percentage']; ?>%">
-                                <span class="graph-value"><?php echo $data['percentage']; ?>%</span>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
-
-                        <?php if (count($speciesDistribution) < 2): // Add placeholder for other species if less than 2 species ?>
-                        <div class="graph-bar-container">
-                            <div class="graph-label">Others</div>
-                            <div class="graph-bar" style="--percentage: 0%">
-                                <span class="graph-value">0%</span>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
-                <div class="content-grid">
-                    <div class="pets-section">
-                        <h2>Recent Pets</h2>
-                        <div class="pet-cards">
-                            <?php foreach ($recentPets as $index => $pet): ?>
-                            <div class="pet-card">
-                                <img
-                                    src="<?php echo $placeholderImages[$index % count($placeholderImages)]; ?>"
-                                    alt="<?php echo htmlspecialchars($pet['name']); ?>"
-                                    class="pet-image"
-                                />
-                                <div class="pet-info">
-                                    <h3><?php echo htmlspecialchars($pet['name']); ?></h3>
-                                    <p><?php echo htmlspecialchars($pet['breed_name']); ?> • <?php echo $pet['age'] . ' ' . ($pet['age'] == 1 ? 'year' : 'years'); ?></p>
-                                    <p class="adoption-status"><?php echo $pet['adoption_status']; ?></p>
-                                </div>
-                                <button class="view-button" onclick="viewPetDetails(<?php echo $pet['pet_id']; ?>)">
-                                    View Details
-                                </button>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-
-                    <div class="schedule-section">
-                        <h2>Upcoming Training</h2>
-                        <div class="schedule-cards">
-                            <?php foreach ($upcomingTraining as $training): ?>
-                            <div class="schedule-card">
-                                <div class="schedule-header">
-                                    <div class="training-type">
-                                        <?php echo htmlspecialchars($training['type_name']); ?> Training
-                                    </div>
-                                    <div class="training-time">
-                                        <?php echo date('M d, Y', strtotime($training['date'])); ?> •
-                                        <?php echo $training['duration']; ?> min
-                                    </div>
-                                </div>
-                                <div class="training-pet">
-                                    <?php echo htmlspecialchars($training['name']); ?> •
-                                    <?php echo htmlspecialchars($training['breed_name']); ?>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                </div>
+                if ($current_view === 'profile') {
+                    include('_profile_content.php');
+                } elseif ($user_type === 'Adopter') {
+                    include('_adopter_dashboard_content.php');
+                } elseif ($user_type === 'Personnel' && $personnel_role === 'Trainer') {
+                    include('_trainer_dashboard_content.php');
+                } elseif ($user_type === 'Personnel' && ($personnel_role === 'Staff' || empty($personnel_role)) ) {
+                    // Staff (non-trainer, non-manager personnel) get a generic dashboard for now
+                    // Or redirect them if they shouldn't have access to this dashboard.php
+                    echo "<div class='dashboard-section'><h2>Welcome Staff Member!</h2><p>This is your dashboard. Specific staff functionalities can be added here.</p></div>";
+                    // Optionally include general stats or relevant info for staff
+                     $dashboardData = getAllDashboardData();
+                     $stats = $dashboardData['stats'];
+                     include '_general_stats_content.php'; // A new partial for general stats
+                } else {
+                    // Fallback for undefined roles or if a Manager lands here (they should be in /admin)
+                    // For now, show a generic message or the general stats dashboard
+                    echo "<div class='dashboard-section'><h2>Welcome to Escova INC!</h2><p>Your dashboard content is being prepared based on your role.</p></div>";
+                     $dashboardData = getAllDashboardData();
+                     $stats = $dashboardData['stats'];
+                     include '_general_stats_content.php';
+                }
+                ?>
             </main>
         </div>
 
         <script>
             function viewPetDetails(petId) {
-                alert('View details for pet ID: ' + petId);
-                // You can implement redirection to pet details page
-                // window.location.href = 'pet-details.php?id=' + petId;
+                // This could redirect to a dedicated pet detail page
+                alert('Viewing details for pet ID: ' + petId + '. Implement pet_details.php?id=' + petId);
+                // window.location.href = 'pet_details.php?id=' + petId;
+            }
+            function requestAdoption(petId) {
+                alert('Adoption request for pet ID: ' + petId + '. This feature needs to be implemented.');
+                // This would typically involve a form or AJAX call
             }
         </script>
     </body>

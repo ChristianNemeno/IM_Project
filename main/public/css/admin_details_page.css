@@ -21,14 +21,14 @@
     color: var(--secondary-accent);
     text-decoration: none;
 }
- .detail-group a:hover {
+.detail-group a:hover {
     text-decoration: underline;
 }
- .pet-detail-group {
-     min-height: 110px; /* Ensure enough space for floating image */
- }
+.pet-detail-group {
+    min-height: 110px; /* Ensure enough space for floating image */
+}
 
- /* Style for the delete button (from training details) */
+/* Style for the delete button (from training details) */
 .admin-button[style*="--tertiary-accent"]:hover {
     opacity: 0.9;
     box-shadow: 0 2px 5px rgba(207, 102, 121, 0.3);

@@ -10,7 +10,7 @@
     <title><?php echo isset($pageTitle) ? htmlspecialchars($pageTitle) : 'Admin Dashboard'; ?> - Escova INC.</title>
     <link rel="stylesheet" href="../public/css/admin_styles.css">
     <link rel="stylesheet" href="../public/css/admin_details_page.css"> 
-    <link rel="stylesheet" href="../public/css/admin_manage_roles.css"> 
+    <link rel="stylesheet" href="../public/css/admin_manage_role.css"> 
     <link rel="stylesheet" href="../public/css/admin_dashboard_inline.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -36,9 +36,13 @@
                     <li><a href="manage_adoptions.php" class="<?= ($currentPage == 'manage_adoptions.php') ? 'active' : '' ?>">
                         <i class="fas fa-home"></i> <span>Adoption Mgmt</span>
                     </a></li>
+
+                
+<li><a href="manage_adoption_requests.php" class="<?= ($currentPage == 'manage_adoption_requests.php') ? 'active' : '' ?>"> <i class="fas fa-clipboard-check"></i> <span>Adoption Requests</span>
+</a></li>
                     <li><a href="manage_training.php" class="<?= ($currentPage == 'manage_training.php') ? 'active' : '' ?>">
                         <i class="fas fa-graduation-cap"></i> <span>Training Mgmt</span>
-                    </a></li>
+                    </a>
                 </ul>
             </nav>
             <div class="admin-footer">
