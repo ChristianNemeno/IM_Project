@@ -30,8 +30,10 @@ if (!isset($defaultPetImage)) $defaultPetImage = '../../public/images/placeholde
     <?php echo $request_message_display; // Display any status messages ?>
 
     <?php if ($pet_details):
-        $image_path = !empty($pet_details['pet_image']) ? '../../public/uploads/pets/' . htmlspecialchars($pet_details['pet_image']) : $defaultPetImage;
-        $current_pet_id = $pet_details['pet_id']; // Store for form
+$image_path = !empty($pet_details['pet_image']) ? '../public/uploads/pets/' . htmlspecialchars($pet_details['pet_image']) : $defaultPetImage;
+
+// Add this for debugging:
+echo "<p>Generated Image Path: " . htmlspecialchars($image_path) . "</p>";        $current_pet_id = $pet_details['pet_id']; // Store for form
         $current_pet_name = $pet_details['name'];
     ?>
         <h2>Pet Details: <?php echo htmlspecialchars($current_pet_name); ?></h2>
