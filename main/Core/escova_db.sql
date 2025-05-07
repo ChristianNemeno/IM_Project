@@ -2,8 +2,8 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Apr 20, 2025 at 11:11 AM
+-- Host: localhost:3307
+-- Generation Time: May 07, 2025 at 11:22 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -40,7 +40,8 @@ INSERT INTO `tbladopter` (`adopter_id`) VALUES
 (2),
 (3),
 (4),
-(5);
+(5),
+(11);
 
 -- --------------------------------------------------------
 
@@ -65,6 +66,31 @@ CREATE TABLE `tbladoptionrecord` (
 INSERT INTO `tbladoptionrecord` (`adoption_id`, `pet_id`, `adopter_id`, `adoption_date`, `fee_paid`, `created_at`, `updated_at`) VALUES
 (1, 2, 1, '2023-04-01', 100.00, '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
 (2, 5, 2, '2023-04-15', 150.00, '2025-04-11 05:08:09', '2025-04-11 05:08:09');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbladoptionrequest`
+--
+
+CREATE TABLE `tbladoptionrequest` (
+  `request_id` int(11) NOT NULL,
+  `pet_id` int(11) NOT NULL,
+  `adopter_user_id` int(11) NOT NULL,
+  `request_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `status` enum('Pending','Approved','Rejected','Cancelled') NOT NULL DEFAULT 'Pending',
+  `adopter_message` text DEFAULT NULL,
+  `admin_notes` text DEFAULT NULL,
+  `processed_by_admin_id` int(11) DEFAULT NULL,
+  `processed_date` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbladoptionrequest`
+--
+
+INSERT INTO `tbladoptionrequest` (`request_id`, `pet_id`, `adopter_user_id`, `request_date`, `status`, `adopter_message`, `admin_notes`, `processed_by_admin_id`, `processed_date`) VALUES
+(1, 7, 11, '2025-05-07 07:33:24', 'Pending', '', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -155,7 +181,8 @@ INSERT INTO `tblpersonnel` (`personnel_id`, `hire_date`, `salary`) VALUES
 (6, '2023-01-01', 50000.00),
 (7, '2023-02-01', 45000.00),
 (8, '2023-03-01', 48000.00),
-(10, '2025-04-16', NULL);
+(10, '2025-04-16', NULL),
+(12, '2025-05-06', NULL);
 
 -- --------------------------------------------------------
 
@@ -185,8 +212,8 @@ INSERT INTO `tblpet` (`pet_id`, `name`, `breed_id`, `age`, `health_status`, `ado
 (3, 'Bella', 3, 1, 'Fair', 'Available', NULL, '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
 (4, 'Whiskers', 4, 4, 'Good', 'Available', NULL, '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
 (5, 'Shadow', 5, 2, 'Excellent', 'Adopted', NULL, '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
-(6, 'Luna', 1, 3, 'Good', 'Available', NULL, '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
-(7, 'Christian', 3, 12, 'Excellent', 'Available', '0c656b0281cc7d499ffb2b49ca8ecc63.png', '2025-04-17 12:42:11', '2025-04-17 12:42:11');
+(6, 'Luna', 1, 3, 'Good', 'Available', '6c3e59608ffb83d5d9df4ae9e588b6af.jpg', '2025-04-11 05:08:09', '2025-05-07 01:30:11'),
+(7, 'Christian', 3, 12, 'Excellent', 'Available', '678cfbc4a7014f5b02f184ae807d2ed6.jpg', '2025-04-17 12:42:11', '2025-05-07 01:28:21');
 
 -- --------------------------------------------------------
 
@@ -225,7 +252,8 @@ CREATE TABLE `tbltrainer` (
 
 INSERT INTO `tbltrainer` (`trainer_id`, `specialization`, `experience_years`) VALUES
 (7, 'Obedience', 5),
-(8, 'Agility', 3);
+(8, 'Agility', 3),
+(12, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -305,9 +333,11 @@ INSERT INTO `tbluser` (`user_id`, `name`, `phone`, `email`, `address`, `user_typ
 (5, 'Sara Lee', '567-890-1234', 'sara@example.com', '202 Maple St', 'Adopter', '', '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
 (6, 'Bob Brown', '678-901-2345', 'bob@example.com', '321 Pine St', 'Personnel', '', '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
 (7, 'Charlie Davis', '789-012-3456', 'charlie@example.com', '654 Cedar St', 'Personnel', '', '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
-(8, 'Emma Clark', '890-123-4567', 'emma@example.com', '987 Birch St', 'Personnel', '', '2025-04-11 05:08:09', '2025-04-11 05:08:09'),
+(8, 'Emma Clark', '890-123-4567', 'emma@example.com', '987 Birch St', 'Personnel', '', '2025-04-11 05:08:09', '2025-05-06 14:11:37'),
 (9, 'Jude Valencia Syndikato', '09822', 'jude@gmail.com', 'guadlaupe cebu', 'Adopter', '$2y$10$zSnYGeHxtgV36p/vc9BBg.bZz04Zj4dy6.wNq/aV9kh/vyD48cb0q', '2025-04-15 03:09:14', '2025-04-15 03:09:14'),
-(10, 'Ben Escolano', '123', 'ben@gmail.com', 'Lacion', 'Personnel', '$2y$10$7dBi4ckn2rByTv56GrNceu9MGFznEJTEXc3IfKAWKs4yqZtpQYJ7K', '2025-04-16 14:30:08', '2025-04-16 14:30:08');
+(10, 'Ben Escolano', '123', 'ben@gmail.com', 'Lacion', 'Personnel', '$2y$10$7dBi4ckn2rByTv56GrNceu9MGFznEJTEXc3IfKAWKs4yqZtpQYJ7K', '2025-04-16 14:30:08', '2025-04-16 14:30:08'),
+(11, 'Joseph Novabos', '123-456-7894', 'joseph@gmail.com', '469-1A Maria Theresa Village 2', 'Adopter', '$2y$10$j4o7EyI5Drvsplb7td2gjOutg39FBRXp1LHA.ntmJSwxgldZMjkvW', '2025-05-06 14:12:12', '2025-05-06 14:12:12'),
+(12, 'karol@gmail.com', '123-456-7895', 'karol@gmail.com', '469-1A Maria Theresa Village 2', 'Personnel', '$2y$10$2Mz96E9GYUqluqDRCYnyEuQMNL5hFyp2dS9AGOTKArIGJDKFe3Tc6', '2025-05-06 14:16:47', '2025-05-06 14:16:47');
 
 --
 -- Indexes for dumped tables
@@ -326,6 +356,16 @@ ALTER TABLE `tbladoptionrecord`
   ADD PRIMARY KEY (`adoption_id`),
   ADD UNIQUE KEY `pet_id` (`pet_id`),
   ADD KEY `adopter_id` (`adopter_id`);
+
+--
+-- Indexes for table `tbladoptionrequest`
+--
+ALTER TABLE `tbladoptionrequest`
+  ADD PRIMARY KEY (`request_id`),
+  ADD KEY `idx_pet_id` (`pet_id`),
+  ADD KEY `idx_adopter_user_id` (`adopter_user_id`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_processed_by_admin_id` (`processed_by_admin_id`);
 
 --
 -- Indexes for table `tblbreed`
@@ -406,6 +446,12 @@ ALTER TABLE `tbladoptionrecord`
   MODIFY `adoption_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `tbladoptionrequest`
+--
+ALTER TABLE `tbladoptionrequest`
+  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `tblbreed`
 --
 ALTER TABLE `tblbreed`
@@ -445,7 +491,7 @@ ALTER TABLE `tbltrainingtype`
 -- AUTO_INCREMENT for table `tbluser`
 --
 ALTER TABLE `tbluser`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Constraints for dumped tables
@@ -463,6 +509,14 @@ ALTER TABLE `tbladopter`
 ALTER TABLE `tbladoptionrecord`
   ADD CONSTRAINT `tbladoptionrecord_ibfk_1` FOREIGN KEY (`pet_id`) REFERENCES `tblpet` (`pet_id`),
   ADD CONSTRAINT `tbladoptionrecord_ibfk_2` FOREIGN KEY (`adopter_id`) REFERENCES `tbladopter` (`adopter_id`);
+
+--
+-- Constraints for table `tbladoptionrequest`
+--
+ALTER TABLE `tbladoptionrequest`
+  ADD CONSTRAINT `fk_adoptionrequest_admin` FOREIGN KEY (`processed_by_admin_id`) REFERENCES `tbluser` (`user_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_adoptionrequest_adopter` FOREIGN KEY (`adopter_user_id`) REFERENCES `tbluser` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_adoptionrequest_pet` FOREIGN KEY (`pet_id`) REFERENCES `tblpet` (`pet_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `tblbreed`
