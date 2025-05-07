@@ -10,7 +10,7 @@ if (session_status() == PHP_SESSION_NONE) {
 function getDbConnection() {
     // Important: Use your actual port if it's not the default 3306
     // $servername = "localhost"; // Default port
-    $servername = "localhost:3307"; // As per your code
+    $servername = "localhost"; // As per your code
     $username = "root";
     $password = "";
     $dbname = "escova_db";
